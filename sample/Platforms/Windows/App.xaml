@@ -1,0 +1,6 @@
+﻿<maui:MauiWinUIApplication
+    x:Class="Maui.Biometric.WinUI.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:local="using:Maui.Biometric.WinUI"
+    xmlns:maui="using:Microsoft.Maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" />

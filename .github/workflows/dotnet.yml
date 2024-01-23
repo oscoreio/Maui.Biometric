@@ -1,0 +1,40 @@
+name: Build, test and publish
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/**'
+      - '.github/workflows/**'
+
+jobs:
+  buind-test-publish:
+    name: Build, test and publish
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install workloads
+        run: dotnet workload install maui
+        
+      - name: Install Tizen workload on macOS / Linux
+        if: runner.os != 'Windows'
+        run: curl -sSL https://raw.githubusercontent.com/Samsung/Tizen.NET/main/workload/scripts/workload-install.sh | sudo bash
+
+      - name: Install Tizen workload on Windows
+        if: runner.os == 'Windows'
+        run: |
+          Invoke-WebRequest 'https://raw.githubusercontent.com/Samsung/Tizen.NET/main/workload/scripts/workload-install.ps1' -OutFile 'workload-install.ps1'
+          ./workload-install.ps1
+        
+      - name: Build
+        run: dotnet build src/libs/Maui.Biometric
+          --configuration Release
+
+      - name: Publish
+        run: dotnet nuget push
+          **.nupkg
+          --skip-duplicate
+          --source https://api.nuget.org/v3/index.json
+          --api-key ${{ secrets.NUGET_KEY }}

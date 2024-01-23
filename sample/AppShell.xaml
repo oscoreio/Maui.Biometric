@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    Shell.FlyoutBehavior="Disabled"
+    Title="Maui.Biometric.SampleApp"
+    x:Class="Maui.Biometric.SampleApp.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:local="clr-namespace:Maui.Biometric.SampleApp"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <ShellContent
+        ContentTemplate="{DataTemplate local:MainPage}"
+        Route="MainPage"
+        Title="Home" />
+
+</Shell>
