@@ -13,7 +13,8 @@ public partial class MainPage : ContentPage
     {
         base.OnAppearing();
 
-        AuthenticationTypeLabel.Text = "Auth Type: " + await BiometricAuthentication.Current.GetAuthenticationTypeAsync();
+        var type = await BiometricAuthentication.Current.GetAuthenticationTypeAsync();
+        AuthenticationTypeLabel.Text = $"Auth Type: {type:G}";
     }
 
     private async void OnAuthenticate(object sender, EventArgs e)
@@ -43,7 +44,9 @@ public partial class MainPage : ContentPage
         StatusLabel.Text = "";
 
         var result = await BiometricAuthentication.Current.AuthenticateAsync(
-            request: new AuthenticationRequest("My App", reason)
+            request: new AuthenticationRequest(
+                title: "My App",
+                reason: reason)
             {
                 // all optional
                 CancelTitle = cancel ?? string.Empty,

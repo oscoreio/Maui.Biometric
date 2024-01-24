@@ -42,8 +42,10 @@ builder
 
 - Use through `BiometricAuthentication.Current` or using `IBiometricAuthentication` from DI:
 ```csharp
-var request = new AuthenticationRequestConfiguration ("Prove you have fingers!", "Because without it you can't have access");
-var result = await BiometricAuthentication.Current.AuthenticateAsync(request);
+var result = await BiometricAuthentication.Current.AuthenticateAsync(
+    new AuthenticationRequest(
+        title: "Prove you have fingers!",
+        reason: "Because without it you can't have access"));
 if (result.Authenticated)
 {
     // do secret stuff :)
