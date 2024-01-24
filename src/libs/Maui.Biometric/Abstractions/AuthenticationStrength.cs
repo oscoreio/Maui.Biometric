@@ -1,7 +1,7 @@
 ﻿namespace Maui.Biometric.Abstractions;
 
 /// <summary>
-/// Enumeration that optionally filters out authenticator methods to use.
+/// Enumeration that optionally filters out authenticator methods to use. <br/>
 /// You can filter by strong or weak authentication methods or can allow alternative methods by using Any.
 /// </summary>
 public enum AuthenticationStrength
