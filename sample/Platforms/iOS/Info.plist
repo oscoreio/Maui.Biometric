@@ -28,5 +28,7 @@
 	</array>
 	<key>XSAppIconAssets</key>
 	<string>Assets.xcassets/appicon.appiconset</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>This app requires Face ID for secure authentication and to provide a personalized experience.</string>
 </dict>
 </plist>

@@ -8,18 +8,26 @@ Provides a cross-platform implementation of biometric authentication.
 Supports iOS, macOS, Android and Windows.  
 Continuation of the abandoned Plugin.Fingerprint in the MAUI ecosystem.  
 
+### Supported Platforms
+| Platform | Minimum Version Supported             |
+|----------|---------------------------------------|
+| iOS      | 12.2+                                 |
+| macOS    | 15+                                   |
+| Android  | 6.0 (API 23)                          |
+| Windows  | 11 and 10 version 1809+ (build 17763) |
+
 ## Usage
 - Add NuGet package to your project:
 ```xml
-<PackageReference Include="Oscore.Maui.Biometric" Version="1.0.0" />
+<PackageReference Include="Oscore.Maui.Biometric" Version="1.1.0" />
 ```
 
 - iOS - Add `NSFaceIDUsageDescription` to your Info.plist to describe the reason your app uses Face ID. 
 (see [Documentation](https://developer.apple.com/library/content/documentation/General/Reference/InfoPlistKeyReference/Articles/CocoaKeys.html#//apple_ref/doc/uid/TP40009251-SW75)). 
 Otherwise the App will crash when you start a Face ID authentication on iOS 11.3+.
 ```xml
-<key>NSFaceIDUsageDescription</key>
-<string>Need your face to unlock secrets!</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>This app requires Face ID for secure authentication and to provide a personalized experience.</string>
 ```
 
 - Android - Request the permission in `AndroidManifest.xml`
