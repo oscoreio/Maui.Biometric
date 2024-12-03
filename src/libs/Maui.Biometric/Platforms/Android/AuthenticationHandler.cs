@@ -1,10 +1,8 @@
 using Android.Content;
 using Java.Lang;
-using Maui.Biometric.Abstractions;
 using AndroidX.Biometric;
 
 // ReSharper disable once CheckNamespace
-
 namespace Maui.Biometric;
 
 internal sealed class AuthenticationHandler : BiometricPrompt.AuthenticationCallback, IDialogInterfaceOnClickListener
@@ -22,7 +20,7 @@ internal sealed class AuthenticationHandler : BiometricPrompt.AuthenticationCall
         
         _taskCompletionSource.TrySetResult(new AuthenticationResult
         {
-            Status = AuthenticationResultStatus.Succeeded,
+            Status = AuthenticationStatus.Success,
         });
     }
 
@@ -37,10 +35,10 @@ internal sealed class AuthenticationHandler : BiometricPrompt.AuthenticationCall
                 : string.Empty,
             Status = errorCode switch
             {
-                BiometricPrompt.ErrorLockout => AuthenticationResultStatus.TooManyAttempts,
-                BiometricPrompt.ErrorUserCanceled => AuthenticationResultStatus.Canceled,
-                BiometricPrompt.ErrorNegativeButton => AuthenticationResultStatus.Canceled,
-                _ => AuthenticationResultStatus.Failed
+                BiometricPrompt.ErrorLockout => AuthenticationStatus.TooManyAttempts,
+                BiometricPrompt.ErrorUserCanceled => AuthenticationStatus.Canceled,
+                BiometricPrompt.ErrorNegativeButton => AuthenticationStatus.Canceled,
+                _ => AuthenticationStatus.Failed
             }
         });
     }
@@ -49,7 +47,7 @@ internal sealed class AuthenticationHandler : BiometricPrompt.AuthenticationCall
     {
         _taskCompletionSource.TrySetResult(new AuthenticationResult
         {
-            Status = AuthenticationResultStatus.Canceled,
+            Status = AuthenticationStatus.Canceled,
         });
     }
 

@@ -6,20 +6,20 @@
 
 Provides a cross-platform implementation of biometric authentication.  
 Supports iOS, macOS, Android and Windows.  
-Continuation of the abandoned Plugin.Fingerprint in the MAUI ecosystem.  
+This repository has been rewritten taking into account the API of the xamarin-fingerprint and Plugin.Maui.Biometric libraries
 
 ### Supported Platforms
 | Platform | Minimum Version Supported             |
 |----------|---------------------------------------|
 | iOS      | 12.2+                                 |
 | macOS    | 15+                                   |
-| Android  | 6.0 (API 23)                          |
+| Android  | 5.0 (API 21)                          |
 | Windows  | 11 and 10 version 1809+ (build 17763) |
 
 ## Usage
 - Add NuGet package to your project:
 ```xml
-<PackageReference Include="Oscore.Maui.Biometric" Version="1.1.0" />
+<PackageReference Include="Oscore.Maui.Biometric" Version="2.0.0" />
 ```
 
 - iOS - Add `NSFaceIDUsageDescription` to your Info.plist to describe the reason your app uses Face ID. 
@@ -50,17 +50,16 @@ builder
 
 - Use through `BiometricAuthentication.Current` or using `IBiometricAuthentication` from DI:
 ```csharp
-var result = await BiometricAuthentication.Current.AuthenticateAsync(
-    new AuthenticationRequest(
-        title: "Prove you have fingers!",
-        reason: "Because without it you can't have access"));
-if (result.Authenticated)
+if (await BiometricAuthentication.Current.IsAvailableAsync())
 {
-    // do secret stuff :)
-}
-else
-{
-    // not allowed to do secret stuff :(
+    var result = await BiometricAuthentication.Current.AuthenticateAsync(
+        new AuthenticationRequest(
+            title: "Authenticate",
+            reason: "Please authenticate to proceed"));
+    if (result.IsSuccessful)
+    {
+        // User authenticated
+    }
 }
 ```
 
@@ -93,11 +92,4 @@ You have to enable telnet: Programs and Features > Add Windows Feature > Telnet 
 
 ## Links
 - https://github.com/smstuebe/xamarin-fingerprint
-- https://stackoverflow.com/questions/633132/is-ms-pl-microsoft-public-license-code-allowed-in-commercial-product
-
-## Legal information and credits
-
-It was forked from the [xamarin-fingerprint](https://github.com/smstuebe/xamarin-fingerprint) project.  
-xamarin-fingerprint is a project by [Sven-Michael Stübe](https://github.com/smstuebe).  
-It was licensed under the [MS-PL license](https://github.com/smstuebe/xamarin-fingerprint/blob/master/LICENSE).  
-This fork changes the license to MIT with attribution to the original license.  
+- https://github.com/FreakyAli/Plugin.Maui.Biometric

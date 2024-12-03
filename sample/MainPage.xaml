@@ -2,25 +2,62 @@
 <ContentPage
     x:Class="Maui.Biometric.SampleApp.MainPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:sampleapp="clr-namespace:Maui.Biometric.SampleApp"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+	x:DataType="{x:Type sampleapp:MainViewModel}">
+
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior EventName="Appearing" Command="{Binding AppearingCommand}" />
+    </ContentPage.Behaviors>
 
     <VerticalStackLayout Padding="10" Spacing="10">
-        <Label x:Name="AuthenticationTypeLabel" />
+        <Label Text="Status:"/>
         <HorizontalStackLayout Spacing="10">
-            <Switch x:Name="AutoCancelSwitch" />
-            <Label Text="Cancel after 10sec" />
+            <Label Text="Authentication Type: " />
+            <Label Text="{Binding AuthenticationType}" />
         </HorizontalStackLayout>
         <HorizontalStackLayout Spacing="10">
-            <Switch x:Name="AllowAlternativeSwitch" />
-            <Label Text="Allow alternative authentication method (Password / PIN)" />
+            <Label Text="Authentication Availability: " />
+            <Label Text="{Binding AuthenticationAvailability}" />
         </HorizontalStackLayout>
+        <HorizontalStackLayout Spacing="10">
+            <Label Text="Is Authentication Available: " />
+            <Label Text="{Binding IsAuthenticationAvailable}" />
+        </HorizontalStackLayout>
+        <HorizontalStackLayout Spacing="10">
+            <Label Text="Status: " VerticalOptions="Center" />
+            <Label Text="{Binding Status}" />
+        </HorizontalStackLayout>
+        <Label Text="Authenticators:"/>
+        <HorizontalStackLayout Spacing="10">
+            <Label Text="DeviceCredential(will request password as fallback): " VerticalOptions="Center" />
+            <Switch IsToggled="{Binding DeviceCredentialAuthenticator}" />
+        </HorizontalStackLayout>
+        <HorizontalStackLayout Spacing="10">
+            <Label Text="Biometric: " VerticalOptions="Center" />
+            <Switch IsToggled="{Binding BiometricAuthenticator}" />
+        </HorizontalStackLayout>
+        <HorizontalStackLayout Spacing="10">
+            <Label Text="BiometricStrong(Android): " VerticalOptions="Center" />
+            <Switch IsToggled="{Binding BiometricStrongAuthenticator}" />
+        </HorizontalStackLayout>
+        <HorizontalStackLayout Spacing="10">
+            <Label Text="CompanionDevice(iOS/macOS): " VerticalOptions="Center" />
+            <Switch IsToggled="{Binding CompanionDeviceAuthenticator}" />
+        </HorizontalStackLayout>
+        <Label Text="Options:"/>
         <HorizontalStackLayout IsVisible="{OnPlatform Android=True, Default=False}" Spacing="10">
-            <Switch IsToggled="True" x:Name="ConfirmationRequiredSwitch" />
+            <Switch IsToggled="{Binding ConfirmationRequired}" />
             <Label Text="Require Confirmation" />
         </HorizontalStackLayout>
-        <Button Clicked="OnAuthenticate" Text="Authenticate" />
-        <Button Clicked="OnAuthenticateLocalized" Text="Authenticate localized" />
-        <Label x:Name="StatusLabel" />
+        <Label Text="Commands:"/>
+        <Button Text="Authenticate" Command="{Binding AuthenticateCommand}" />
+        <Button Text="Authenticate localized" Command="{Binding AuthenticateLocalizedCommand}" />
+        <HorizontalStackLayout Spacing="10" HorizontalOptions="Center">
+            <Switch IsToggled="{Binding AutoCancel}" />
+            <Label Text="Cancel after 10sec" />
+        </HorizontalStackLayout>
     </VerticalStackLayout>
 
 </ContentPage>

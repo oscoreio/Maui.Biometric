@@ -1,6 +1,6 @@
 using Windows.Security.Credentials.UI;
-using Maui.Biometric.Abstractions;
 
+// ReSharper disable once CheckNamespace
 namespace Maui.Biometric;
 
 internal sealed class WindowsBiometricAuthentication : NotImplementedBiometricAuthentication
@@ -9,68 +9,68 @@ internal sealed class WindowsBiometricAuthentication : NotImplementedBiometricAu
         AuthenticationRequest configuration,
         CancellationToken cancellationToken = default)
     {
-        var result = new AuthenticationResult();
-
         try
         {
-            var verificationResult = await UserConsentVerifier.RequestVerificationAsync(configuration.Reason);
+            var verificationResult = await UserConsentVerifier.RequestVerificationAsync(
+                message: configuration.Reason);
 
-            switch (verificationResult)
+            return new AuthenticationResult
             {
-                case UserConsentVerificationResult.Verified:
-                    result.Status = AuthenticationResultStatus.Succeeded;
-                    break;
-
-                case UserConsentVerificationResult.DeviceBusy:
-                case UserConsentVerificationResult.DeviceNotPresent:
-                case UserConsentVerificationResult.DisabledByPolicy:
-                case UserConsentVerificationResult.NotConfiguredForUser:
-                    result.Status = AuthenticationResultStatus.NotAvailable;
-                    break;
-                    
-                case UserConsentVerificationResult.RetriesExhausted:
-                    result.Status = AuthenticationResultStatus.TooManyAttempts;
-                    break;
-                case UserConsentVerificationResult.Canceled:
-                    result.Status = AuthenticationResultStatus.Canceled;
-                    break;
-                default:
-                    result.Status = AuthenticationResultStatus.Failed;
-                    break;
-            }
+                Status = verificationResult switch
+                {
+                    UserConsentVerificationResult.Verified => AuthenticationStatus.Success,
+                    UserConsentVerificationResult.DeviceBusy or UserConsentVerificationResult.DeviceNotPresent
+                        or UserConsentVerificationResult.DisabledByPolicy
+                        or UserConsentVerificationResult.NotConfiguredForUser => AuthenticationStatus.NotAvailable,
+                    UserConsentVerificationResult.RetriesExhausted => AuthenticationStatus.TooManyAttempts,
+                    UserConsentVerificationResult.Canceled => AuthenticationStatus.Canceled,
+                    _ => AuthenticationStatus.Failed
+                },
+                ErrorMessage = verificationResult switch
+                {
+                    UserConsentVerificationResult.DeviceBusy => "The biometric verifier device is performing an operation and is unavailable.",
+                    UserConsentVerificationResult.DeviceNotPresent => "There is no biometric verifier device available.",
+                    UserConsentVerificationResult.DisabledByPolicy => "Group policy has disabled the biometric verifier device.",
+                    UserConsentVerificationResult.NotConfiguredForUser => "A biometric verifier device is not configured for this user.",
+                    UserConsentVerificationResult.RetriesExhausted => "After 10 attempts, the original verification request and all subsequent attempts at the same verification were not verified.",
+                    UserConsentVerificationResult.Canceled => "The verification operation was canceled.",
+                    _ => string.Empty,
+                }
+            };
         }
         catch (Exception ex)
         {
-            result.Status = AuthenticationResultStatus.UnknownError;
-            result.ErrorMessage = ex.Message;
+            return new AuthenticationResult
+            {
+                Status = AuthenticationStatus.UnknownError,
+                ErrorMessage = ex.Message,
+            };
         }
-
-        return result;
     }
 
-    public override async Task<Availability> GetAvailabilityAsync(
-        AuthenticationStrength strength = AuthenticationStrength.Weak)
+    public override async Task<AuthenticationAvailability> GetAvailabilityAsync(
+        Authenticator authenticators = AuthenticationRequest.DefaultAuthenticators)
     {
         var availability = await UserConsentVerifier.CheckAvailabilityAsync();
         
         return availability switch
         {
-            UserConsentVerifierAvailability.Available => Availability.Available,
-            UserConsentVerifierAvailability.DeviceNotPresent => Availability.NoSensor,
-            UserConsentVerifierAvailability.NotConfiguredForUser => Availability.NoBiometric,
-            UserConsentVerifierAvailability.DisabledByPolicy => Availability.NoPermission,
-            UserConsentVerifierAvailability.DeviceBusy => Availability.Unknown,
-            _ => Availability.Unknown,
+            UserConsentVerifierAvailability.Available => AuthenticationAvailability.Available,
+            UserConsentVerifierAvailability.DeviceNotPresent => AuthenticationAvailability.NoSensor,
+            UserConsentVerifierAvailability.NotConfiguredForUser => AuthenticationAvailability.NoBiometric,
+            UserConsentVerifierAvailability.DisabledByPolicy => AuthenticationAvailability.NoPermission,
+            UserConsentVerifierAvailability.DeviceBusy => AuthenticationAvailability.TemporaryUnavailable,
+            _ => AuthenticationAvailability.Unknown,
         };
     }
 
-    public override async Task<AuthenticationType> GetAuthenticationTypeAsync()
+    public override async Task<AuthenticationType> GetAuthenticationTypeAsync(
+        Authenticator authenticators = AuthenticationRequest.DefaultAuthenticators)
     {
-        var availability = await GetAvailabilityAsync(
-            strength: AuthenticationStrength.Weak).ConfigureAwait(false);
-        if (availability is Availability.NoBiometric or
-                            Availability.NoPermission or
-                            Availability.Available)
+        var availability = await GetAvailabilityAsync(authenticators).ConfigureAwait(false);
+        if (availability is AuthenticationAvailability.NoBiometric or
+                            AuthenticationAvailability.NoPermission or
+                            AuthenticationAvailability.Available)
         {
             return AuthenticationType.Fingerprint;
         }

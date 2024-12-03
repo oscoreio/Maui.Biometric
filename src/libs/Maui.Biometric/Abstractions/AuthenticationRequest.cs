@@ -1,7 +1,8 @@
-﻿namespace Maui.Biometric.Abstractions;
+﻿// ReSharper disable once CheckNamespace
+namespace Maui.Biometric;
 
 /// <summary>
-/// Configuration of the stuff presented to the user.
+/// Represents a request for authentication.
 /// </summary>
 /// <param name="title"></param>
 /// <param name="reason"></param>
@@ -10,12 +11,17 @@ public class AuthenticationRequest(
     string reason)
 {
     /// <summary>
+    /// Default authenticators that are used during authentication.
+    /// </summary>
+    public const Authenticator DefaultAuthenticators = Authenticator.Biometric | Authenticator.DeviceCredential;
+    
+    /// <summary>
     /// Title of the authentication request.
     /// </summary>
     public string Title { get; } = title;
 
     /// <summary>
-    /// Reason of the authentication request.
+    /// Reason for the authentication request.
     /// </summary>
     public string Reason { get; } = reason;
 
@@ -30,22 +36,13 @@ public class AuthenticationRequest(
     public string FallbackTitle { get; set; } = string.Empty;
 
     /// <summary>
-    /// Shown when a recoverable error has been encountered during authentication. <br/>
-    /// The help strings are provided to give the user guidance for what went wrong. <br/>
-    /// If a string is null or empty, the string provided by Android is shown. <br/>
-    ///  <br/>
-    /// Supported Platforms: Android <br/>
-    /// </summary>
-    public AuthenticationHelpTexts HelpTexts { get; } = new();
-
-    /// <summary>
     /// If set only allows certain authenticators to be used during authentication. <br/>
-    /// Can be set to <see cref="AuthenticationStrength.Strong"/>  to use only fingerprint,
-    /// if the face unlocking is configured to be <see cref="AuthenticationStrength.Weak"/>,
+    /// Can be set to <see cref="Authenticator.BiometricStrong"/>  to use only fingerprint,
+    /// if the face unlocking is configured to be <see cref="Authenticator.Biometric"/>,
     /// but this really depends on the phone manufacturers.
     /// </summary>
-    public AuthenticationStrength Strength { get; set; } = AuthenticationStrength.Weak;
-    
+    public Authenticator Authenticators { get; set; } = DefaultAuthenticators;
+
     /// <summary>
     /// Sets a hint to the system for whether to require user confirmation after authentication. <br/>
     /// For example, implicit modalities like face and iris are passive,

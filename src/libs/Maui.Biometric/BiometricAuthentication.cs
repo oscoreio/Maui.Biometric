@@ -1,6 +1,4 @@
-﻿using Maui.Biometric.Abstractions;
-
-namespace Maui.Biometric;
+﻿namespace Maui.Biometric;
 
 /// <summary>
 /// This class provides access to the biometric authentication implementation.

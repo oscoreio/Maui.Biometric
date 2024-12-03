@@ -1,4 +1,5 @@
-﻿namespace Maui.Biometric.Abstractions;
+﻿// ReSharper disable once CheckNamespace
+namespace Maui.Biometric;
 
 /// <inheritdoc />
 public class NotImplementedBiometricAuthentication : IBiometricAuthentication
@@ -10,12 +11,12 @@ public class NotImplementedBiometricAuthentication : IBiometricAuthentication
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var availability = await GetAvailabilityAsync(request.Strength).ConfigureAwait(false);
-        if (availability != Availability.Available)
+        var availability = await GetAvailabilityAsync(request.Authenticators).ConfigureAwait(false);
+        if (availability != AuthenticationAvailability.Available)
         {
-            var status = availability == Availability.Denied ?
-                AuthenticationResultStatus.Denied :
-                AuthenticationResultStatus.NotAvailable;
+            var status = availability == AuthenticationAvailability.Denied ?
+                AuthenticationStatus.Denied :
+                AuthenticationStatus.NotAvailable;
 
             return new AuthenticationResult { Status = status, ErrorMessage = availability.ToString() };
         }
@@ -25,20 +26,23 @@ public class NotImplementedBiometricAuthentication : IBiometricAuthentication
 
     /// <inheritdoc />
     public async Task<bool> IsAvailableAsync(
-        AuthenticationStrength strength = AuthenticationStrength.Weak)
+        Authenticator authenticators = AuthenticationRequest.DefaultAuthenticators)
     {
-        return await GetAvailabilityAsync(strength).ConfigureAwait(false) == Availability.Available;
+        var availability = await GetAvailabilityAsync(authenticators).ConfigureAwait(false);
+        
+        return availability == AuthenticationAvailability.Available;
     }
 
     /// <inheritdoc />
-    public virtual Task<Availability> GetAvailabilityAsync(
-        AuthenticationStrength strength = AuthenticationStrength.Weak)
+    public virtual Task<AuthenticationAvailability> GetAvailabilityAsync(
+        Authenticator authenticators = AuthenticationRequest.DefaultAuthenticators)
     {
-        return Task.FromResult(Availability.NoImplementation);
+        return Task.FromResult(AuthenticationAvailability.NoImplementation);
     }
 
     /// <inheritdoc />
-    public virtual Task<AuthenticationType> GetAuthenticationTypeAsync()
+    public virtual Task<AuthenticationType> GetAuthenticationTypeAsync(
+        Authenticator authenticators = AuthenticationRequest.DefaultAuthenticators)
     {
         return Task.FromResult(AuthenticationType.None);
     }
@@ -55,7 +59,7 @@ public class NotImplementedBiometricAuthentication : IBiometricAuthentication
     {
         return Task.FromResult(new AuthenticationResult
         {
-            Status = AuthenticationResultStatus.NotAvailable,
+            Status = AuthenticationStatus.NotAvailable,
             ErrorMessage = "Not implemented for the current platform.",
         });
     }
