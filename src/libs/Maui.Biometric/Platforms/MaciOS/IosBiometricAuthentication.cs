@@ -14,6 +14,18 @@ internal sealed class IosBiometricAuthentication : IBiometricAuthentication
         CancellationToken cancellationToken = default)
     {
         var context = new LAContext();
+        var policy = request.Authenticators.MapToLaPolicy();
+        if (!context.CanEvaluatePolicy(policy, out var canEvaluateError))
+        {
+            return new AuthenticationResult
+            {
+                // ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
+                // # simulators return null for any reason
+                Status = canEvaluateError?.ToStatus() ?? AuthenticationStatus.UnknownError,
+                ErrorMessage = canEvaluateError?.LocalizedDescription ?? string.Empty,
+            };
+        }
+        
         if (!string.IsNullOrEmpty(request.FallbackTitle))
         {
             context.LocalizedFallbackTitle = request.FallbackTitle;
@@ -31,7 +43,7 @@ internal sealed class IosBiometricAuthentication : IBiometricAuthentication
         // DeviceOwnerAuthenticationWithBiometrics(Strength: Weak and Strong):
         // https://developer.apple.com/documentation/localauthentication/lapolicy/deviceownerauthenticationwithbiometrics
         var (isSucceeded, error) = await context.EvaluatePolicyAsync(
-            policy: request.Authenticators.MapToLaPolicy(),
+            policy: policy,
             localizedReason: request.Reason).ConfigureAwait(true);
         var result = new AuthenticationResult
         {

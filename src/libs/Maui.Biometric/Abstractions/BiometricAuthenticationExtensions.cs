@@ -24,36 +24,4 @@ public static class BiometricAuthenticationExtensions
         
         return availability == AuthenticationAvailability.Available;
     }
-
-    /// <summary>
-    /// Checks availability and requests the authentication.
-    /// </summary>
-    /// <param name="biometricAuthentication"></param>
-    /// <param name="request">Configuration of the dialog that is displayed to the user.</param>
-    /// <param name="cancellationToken">Token used to cancel the operation.</param>
-    /// <returns>Authentication result</returns>
-    public static async Task<AuthenticationResult> TryAuthenticateAsync(
-        this IBiometricAuthentication biometricAuthentication,
-        AuthenticationRequest request,
-        CancellationToken cancellationToken = default)
-    {
-        ArgumentNullException.ThrowIfNull(biometricAuthentication);
-        ArgumentNullException.ThrowIfNull(request);
-
-        var availability = await biometricAuthentication.GetAvailabilityAsync(request.Authenticators, cancellationToken).ConfigureAwait(false);
-        if (availability != AuthenticationAvailability.Available)
-        {
-            var status = availability == AuthenticationAvailability.Denied ?
-                AuthenticationStatus.Denied :
-                AuthenticationStatus.NotAvailable;
-
-            return new AuthenticationResult
-            {
-                Status = status,
-                ErrorMessage = availability.ToString(),
-            };
-        }
-
-        return await biometricAuthentication.AuthenticateAsync(request, cancellationToken).ConfigureAwait(false);
-    }
 }

@@ -133,7 +133,7 @@ public partial class MainViewModel : ObservableObject
 
         Status = string.Empty;
 
-        var result = await BiometricAuthentication.Current.TryAuthenticateAsync(
+        var result = await BiometricAuthentication.Current.AuthenticateAsync(
             request: new AuthenticationRequest(
                 title: "My App",
                 reason: reason)

@@ -34,7 +34,7 @@ public interface IBiometricAuthentication
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Requests the authentication.
+    /// Checks availability and requests the authentication if available.
     /// </summary>
     /// <param name="request">Configuration of the dialog that is displayed to the user.</param>
     /// <param name="cancellationToken">Token used to cancel the operation.</param>

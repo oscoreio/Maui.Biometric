@@ -112,6 +112,20 @@ internal sealed class AndroidBiometricAuthentication : IBiometricAuthentication
         ArgumentNullException.ThrowIfNull(request);
         ArgumentException.ThrowIfNullOrWhiteSpace(request.Title, nameof(request));
 
+        var availability = await GetAvailabilityAsync(request.Authenticators, cancellationToken).ConfigureAwait(true);
+        if (availability != AuthenticationAvailability.Available)
+        {
+            var status = availability == AuthenticationAvailability.Denied ?
+                AuthenticationStatus.Denied :
+                AuthenticationStatus.NotAvailable;
+
+            return new AuthenticationResult
+            {
+                Status = status,
+                ErrorMessage = availability.ToString(),
+            };
+        }
+        
         try
         {
             var cancel = string.IsNullOrWhiteSpace(request.CancelTitle) ?

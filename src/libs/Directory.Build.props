@@ -9,7 +9,7 @@
   </ItemGroup>
   
   <PropertyGroup Label="Nuget">
-    <Version>2.0.0</Version>
+    <Version>2.1.0</Version>
     <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Authors>Oscore and Sven-Michael Stübe</Authors>
