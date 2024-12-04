@@ -15,10 +15,11 @@ public partial class MainViewModel : ObservableObject
     private bool _confirmationRequired;
 
     [ObservableProperty]
-    private AuthenticationType _authenticationType;
-
-    [ObservableProperty]
-    private AuthenticationAvailability _authenticationAvailability;
+    private AvailabilityResult _availabilityResult = new()
+    {
+        Availability = AuthenticationAvailability.Unknown,
+        Sensors = [],
+    };
 
     [ObservableProperty]
     private bool _isAuthenticationAvailable;
@@ -66,8 +67,7 @@ public partial class MainViewModel : ObservableObject
     {
         try
         {
-            AuthenticationType = await BiometricAuthentication.Current.GetAuthenticationTypeAsync(Authenticators);
-            AuthenticationAvailability = await BiometricAuthentication.Current.GetAvailabilityAsync(Authenticators);
+            AvailabilityResult = await BiometricAuthentication.Current.CheckAvailabilityAsync(Authenticators);
             IsAuthenticationAvailable = await BiometricAuthentication.Current.IsAvailableAsync(Authenticators);
         }
         catch (Exception ex)
@@ -104,7 +104,6 @@ public partial class MainViewModel : ObservableObject
                 reason: "Beweise, dass du Finger hast!",
                 cancel: "Abbrechen",
                 fallback: "Anders!",
-                tooFast: "Viel zu schnell!",
                 cancellationToken: cancellationToken);
         }
         catch (TaskCanceledException)
@@ -121,7 +120,6 @@ public partial class MainViewModel : ObservableObject
         string reason,
         string? cancel = null,
         string? fallback = null,
-        string? tooFast = null,
         CancellationToken cancellationToken = default)
     {
         using var cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
@@ -133,6 +131,10 @@ public partial class MainViewModel : ObservableObject
 
         Status = string.Empty;
 
+        if (await BiometricAuthentication.Current.CheckAvailabilityAsync(cancellationToken: cancellationTokenSource.Token))
+        {
+            
+        }
         var result = await BiometricAuthentication.Current.AuthenticateAsync(
             request: new AuthenticationRequest(
                 title: "My App",

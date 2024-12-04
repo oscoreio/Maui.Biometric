@@ -9,17 +9,17 @@ internal sealed class WindowsBiometricAuthentication : IBiometricAuthentication
         AuthenticationRequest request,
         CancellationToken cancellationToken = default)
     {
-        var availability = await GetAvailabilityAsync(request.Authenticators, cancellationToken).ConfigureAwait(true);
-        if (availability != AuthenticationAvailability.Available)
+        var availability = await CheckAvailabilityAsync(request.Authenticators, cancellationToken).ConfigureAwait(true);
+        if (availability.Availability != AuthenticationAvailability.Available)
         {
-            var status = availability == AuthenticationAvailability.Denied ?
+            var status = availability.Availability == AuthenticationAvailability.Denied ?
                 AuthenticationStatus.Denied :
                 AuthenticationStatus.NotAvailable;
 
             return new AuthenticationResult
             {
                 Status = status,
-                ErrorMessage = availability.ToString(),
+                ErrorMessage = availability.Availability.ToString(),
             };
         }
 
@@ -64,7 +64,7 @@ internal sealed class WindowsBiometricAuthentication : IBiometricAuthentication
         }
     }
 
-    public async Task<AuthenticationAvailability> GetAvailabilityAsync(
+    public async Task<AvailabilityResult> CheckAvailabilityAsync(
         Authenticator authenticators = AuthenticationRequest.DefaultAuthenticators,
         CancellationToken cancellationToken = default)
     {
@@ -73,29 +73,18 @@ internal sealed class WindowsBiometricAuthentication : IBiometricAuthentication
         
         var availability = await operation;
         
-        return availability switch
+        return new AvailabilityResult
         {
-            UserConsentVerifierAvailability.Available => AuthenticationAvailability.Available,
-            UserConsentVerifierAvailability.DeviceNotPresent => AuthenticationAvailability.NoSensor,
-            UserConsentVerifierAvailability.NotConfiguredForUser => AuthenticationAvailability.NoBiometric,
-            UserConsentVerifierAvailability.DisabledByPolicy => AuthenticationAvailability.NoPermission,
-            UserConsentVerifierAvailability.DeviceBusy => AuthenticationAvailability.TemporaryUnavailable,
-            _ => AuthenticationAvailability.Unknown,
+            Availability = availability switch
+            {
+                UserConsentVerifierAvailability.Available => AuthenticationAvailability.Available,
+                UserConsentVerifierAvailability.DeviceNotPresent => AuthenticationAvailability.NoSensor,
+                UserConsentVerifierAvailability.NotConfiguredForUser => AuthenticationAvailability.NoBiometric,
+                UserConsentVerifierAvailability.DisabledByPolicy => AuthenticationAvailability.NoPermission,
+                UserConsentVerifierAvailability.DeviceBusy => AuthenticationAvailability.TemporaryUnavailable,
+                _ => AuthenticationAvailability.Unknown,
+            },
+            Sensors = [],
         };
-    }
-
-    public async Task<AuthenticationType> GetAuthenticationTypeAsync(
-        Authenticator authenticators = AuthenticationRequest.DefaultAuthenticators,
-        CancellationToken cancellationToken = default)
-    {
-        var availability = await GetAvailabilityAsync(authenticators, cancellationToken).ConfigureAwait(true);
-        if (availability is AuthenticationAvailability.NoBiometric or
-                            AuthenticationAvailability.NoPermission or
-                            AuthenticationAvailability.Available)
-        {
-            return AuthenticationType.Fingerprint;
-        }
-
-        return AuthenticationType.None;
     }
 }

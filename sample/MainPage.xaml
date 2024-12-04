@@ -14,12 +14,12 @@
     <VerticalStackLayout Padding="10" Spacing="10">
         <Label Text="Status:"/>
         <HorizontalStackLayout Spacing="10">
-            <Label Text="Authentication Type: " />
-            <Label Text="{Binding AuthenticationType}" />
+            <Label Text="Sensors: " />
+            <ListView ItemsSource="{Binding AvailabilityResult.Sensors}"/>
         </HorizontalStackLayout>
         <HorizontalStackLayout Spacing="10">
             <Label Text="Authentication Availability: " />
-            <Label Text="{Binding AuthenticationAvailability}" />
+            <Label Text="{Binding AvailabilityResult.Availability}" />
         </HorizontalStackLayout>
         <HorizontalStackLayout Spacing="10">
             <Label Text="Is Authentication Available: " />

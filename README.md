@@ -51,7 +51,7 @@ builder
 - Use through `BiometricAuthentication.Current` or using `IBiometricAuthentication` from DI:
 ```csharp
 // You don't need to check if the device supports biometric authentication, the plugin does it for you
-var result = await BiometricAuthentication.Current.TryAuthenticateAsync(
+var result = await BiometricAuthentication.Current.AuthenticateAsync(
     new AuthenticationRequest(
         title: "Authenticate",
         reason: "Please authenticate to proceed"));
@@ -75,18 +75,11 @@ With the Hardware menu you can
 ### Android
 
 - start the emulator (Android >= 6.0)
-- open the settings app
+- open the settings
 - go to Security > Fingerprint, then follow the enrollment instructions
 - when it asks for touch
-- open command prompt
-- `telnet 127.0.0.1 <emulator-id>` (`adb devices` prints "emulator-&lt;emulator-id&gt;")
-- `finger touch 1`
-- `finger touch 1`
-
-Sending fingerprint sensor events for testing the plugin can be done with the telnet commands, too.
-
-**Note for Windows users:**
-You have to enable telnet: Programs and Features > Add Windows Feature > Telnet Client
+- open the Emulator Settings
+- go to Fingerprint menu
 
 ## Links
 - https://github.com/smstuebe/xamarin-fingerprint

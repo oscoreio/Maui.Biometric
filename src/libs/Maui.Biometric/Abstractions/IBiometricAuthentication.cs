@@ -9,7 +9,7 @@ public interface IBiometricAuthentication
     /// <summary>
     /// Checks the availability of biometric authentication. <br/>
     /// Checks are performed in this order: <br/>
-    /// 1. API supports accessing the fingerprint sensor <br/>
+    /// 1. Operating System API supports accessing the fingerprint sensor <br/>
     /// 2. Permission for accessing the fingerprint sensor granted <br/>
     /// 3. Device has sensor <br/>
     /// 4. Fingerprint has been enrolled <br/>
@@ -19,17 +19,7 @@ public interface IBiometricAuthentication
     /// <param name="authenticators"></param>
     /// <param name="cancellationToken"></param>
     /// <returns>Authentication availability</returns>
-    Task<AuthenticationAvailability> GetAvailabilityAsync(
-        Authenticator authenticators = AuthenticationRequest.DefaultAuthenticators,
-        CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Gets the available authentication type.
-    /// </summary>
-    /// <param name="authenticators"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns>Authentication type</returns>
-    Task<AuthenticationType> GetAuthenticationTypeAsync(
+    Task<AvailabilityResult> CheckAvailabilityAsync(
         Authenticator authenticators = AuthenticationRequest.DefaultAuthenticators,
         CancellationToken cancellationToken = default);
 

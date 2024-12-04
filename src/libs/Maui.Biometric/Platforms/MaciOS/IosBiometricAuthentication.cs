@@ -26,7 +26,9 @@ internal sealed class IosBiometricAuthentication : IBiometricAuthentication
             };
         }
         
-        if (!string.IsNullOrEmpty(request.FallbackTitle))
+        // Only set the fallback title if the device credential is enabled.
+        if (request.Authenticators.HasFlag(Authenticator.DeviceCredential) &&
+            !string.IsNullOrEmpty(request.FallbackTitle))
         {
             context.LocalizedFallbackTitle = request.FallbackTitle;
         }
@@ -58,19 +60,7 @@ internal sealed class IosBiometricAuthentication : IBiometricAuthentication
         return result;
     }
 
-    public Task<AuthenticationAvailability> GetAvailabilityAsync(
-        Authenticator authenticators = AuthenticationRequest.DefaultAuthenticators,
-        CancellationToken cancellationToken = default)
-    {
-        using var context = new LAContext();
-        
-        return Task.FromResult(
-            context.CanEvaluatePolicy(authenticators.MapToLaPolicy(), out var error)
-                ? AuthenticationAvailability.Available
-                : error.ToAvailability());
-    }
-
-    public Task<AuthenticationType> GetAuthenticationTypeAsync(
+    public Task<AvailabilityResult> CheckAvailabilityAsync(
         Authenticator authenticators = AuthenticationRequest.DefaultAuthenticators,
         CancellationToken cancellationToken = default)
     {
@@ -79,20 +69,24 @@ internal sealed class IosBiometricAuthentication : IBiometricAuthentication
         // BiometryType: This property is set only after you call the canEvaluatePolicy(_:error:) method,
         // and is set no matter what the call returns.
         // https://developer.apple.com/documentation/localauthentication/lacontext/biometrytype
-        _ = context.CanEvaluatePolicy(authenticators.MapToLaPolicy(), out _);
+        var availability = context.CanEvaluatePolicy(authenticators.MapToLaPolicy(), out var error)
+            ? AuthenticationAvailability.Available
+            : error.ToAvailability();
         
-        // https://support.apple.com/en-ae/118483
-        if (context.BiometryType == LABiometryType.OpticId)
+        return Task.FromResult(new AvailabilityResult
         {
-            return Task.FromResult(AuthenticationType.Iris);
-        }
-
-        return Task.FromResult(context.BiometryType switch
-        {
-            LABiometryType.None => AuthenticationType.None,
-            LABiometryType.TouchId => AuthenticationType.Fingerprint,
-            LABiometryType.FaceId => AuthenticationType.Face,
-            _ => AuthenticationType.None,
+            Availability = availability,
+            Sensors = [context.BiometryType switch
+            {
+                LABiometryType.None => BiometricSensor.None,
+                LABiometryType.TouchId => BiometricSensor.Fingerprint,
+                LABiometryType.FaceId => BiometricSensor.Face,
+                // https://support.apple.com/en-ae/118483
+#pragma warning disable CA1416
+                LABiometryType.OpticId => BiometricSensor.Iris,
+#pragma warning restore CA1416
+                _ => BiometricSensor.None,
+            }],
         });
     }
 }

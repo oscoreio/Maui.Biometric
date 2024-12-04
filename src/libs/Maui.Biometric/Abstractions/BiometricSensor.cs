@@ -4,7 +4,7 @@ namespace Maui.Biometric;
 /// <summary>
 /// The types of biometric authentication supported.
 /// </summary>
-public enum AuthenticationType
+public enum BiometricSensor
 {
     /// <summary>
     /// None.

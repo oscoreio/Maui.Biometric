@@ -1,5 +1,4 @@
 using Android;
-using Android.App;
 using Android.Content.PM;
 using AndroidX.Biometric;
 using AndroidX.Fragment.App;
@@ -11,98 +10,73 @@ namespace Maui.Biometric;
 
 internal sealed class AndroidBiometricAuthentication : IBiometricAuthentication
 {
-    private readonly BiometricManager _manager = BiometricManager.From(Application.Context);
-
-    public async Task<AuthenticationType> GetAuthenticationTypeAsync(
-        Authenticator authenticators = AuthenticationRequest.DefaultAuthenticators,
-        CancellationToken cancellationToken = default)
-    {
-        var availability = await GetAvailabilityAsync(
-            authenticators, cancellationToken).ConfigureAwait(true);
-        if (availability is AuthenticationAvailability.NoBiometric or 
-                            AuthenticationAvailability.NoPermission or 
-                            AuthenticationAvailability.Available)
-        {
-            return AuthenticationType.Fingerprint;
-        }
-
-        return AuthenticationType.None;
-    }
-
-    private static int GetAllowedAuthenticators(
-        Authenticator authenticators = AuthenticationRequest.DefaultAuthenticators)
-    {
-        var androidAuthenticators = 0;
-        if (authenticators.HasFlag(Authenticator.Biometric))
-        {
-            androidAuthenticators |= BiometricManager.Authenticators.BiometricWeak;
-        }
-        if (authenticators.HasFlag(Authenticator.DeviceCredential))
-        {
-            androidAuthenticators |= BiometricManager.Authenticators.DeviceCredential;
-        }
-        if (authenticators.HasFlag(Authenticator.BiometricStrong))
-        {
-            androidAuthenticators |= BiometricManager.Authenticators.BiometricStrong;
-        }
-        
-        return androidAuthenticators;
-
-    }
-    
-    public Task<AuthenticationAvailability> GetAvailabilityAsync(
+    public Task<AvailabilityResult> CheckAvailabilityAsync(
         Authenticator authenticators = AuthenticationRequest.DefaultAuthenticators,
         CancellationToken cancellationToken = default)
     {
         if (!OperatingSystem.IsAndroidVersionAtLeast(23))
         {
-            return Task.FromResult(AuthenticationAvailability.NotSupported);
+            return Task.FromResult(new AvailabilityResult
+            {
+                Availability = AuthenticationAvailability.NotSupported,
+                Sensors = [],
+            });
         }
         
         if (OperatingSystem.IsAndroidVersionAtLeast(23) &&
             !OperatingSystem.IsAndroidVersionAtLeast(28) &&
-            Application.Context.CheckCallingOrSelfPermission(Manifest.Permission.UseFingerprint) != Permission.Granted)
+            Platform.AppContext.CheckCallingOrSelfPermission(Manifest.Permission.UseFingerprint) != Permission.Granted)
         {
-            return Task.FromResult(AuthenticationAvailability.NoPermission);
+            return Task.FromResult(new AvailabilityResult
+            {
+                Availability = AuthenticationAvailability.NoPermission,
+                Sensors = [],
+            });
         }
 
         if (OperatingSystem.IsAndroidVersionAtLeast(28) &&
-            Application.Context.CheckCallingOrSelfPermission(Manifest.Permission.UseBiometric) != Permission.Granted)
+            Platform.AppContext.CheckCallingOrSelfPermission(Manifest.Permission.UseBiometric) != Permission.Granted)
         {
-            return Task.FromResult(AuthenticationAvailability.NoPermission);
-        }
-
-        var canAuthenticate = _manager.CanAuthenticate(GetAllowedAuthenticators(authenticators));
-        var availability = canAuthenticate switch
-        {
-            BiometricManager.BiometricErrorNoHardware => AuthenticationAvailability.NoSensor,
-            BiometricManager.BiometricErrorHwUnavailable => AuthenticationAvailability.Unknown,
-            BiometricManager.BiometricErrorNoneEnrolled => AuthenticationAvailability.NoBiometric,
-            BiometricManager.BiometricSuccess => AuthenticationAvailability.Available,
-            _ => AuthenticationAvailability.Unknown,
-        };
-        if (availability == AuthenticationAvailability.Available ||
-            !authenticators.HasFlag(Authenticator.DeviceCredential))
-        {
-            return Task.FromResult(availability);
-        }
-
-        try
-        {
-            if (Application.Context.GetSystemService(
-                    name: Android.Content.Context.KeyguardService) is not KeyguardManager manager)
+            return Task.FromResult(new AvailabilityResult
             {
-                return Task.FromResult(AuthenticationAvailability.NoFallback);
-            }
+                Availability = AuthenticationAvailability.NoPermission,
+                Sensors = [],
+            });
+        }
+        
+        var biometricManager = BiometricManager.From(Platform.AppContext);
+        var canAuthenticate = biometricManager.CanAuthenticate(GetAllowedAuthenticators(authenticators));
 
-            return Task.FromResult(manager.IsDeviceSecure
-                ? AuthenticationAvailability.Available
-                : AuthenticationAvailability.NoFallback);
-        }
-        catch
+        var sensors = new HashSet<BiometricSensor>();
+        var packageManager = Platform.AppContext.PackageManager;
+        if (packageManager?.HasSystemFeature(PackageManager.FeatureFingerprint) == true)
         {
-            return Task.FromResult(AuthenticationAvailability.NoFallback);
+            sensors.Add(BiometricSensor.Fingerprint);
         }
+        if (OperatingSystem.IsAndroidVersionAtLeast(29))
+        {
+            if (packageManager?.HasSystemFeature(PackageManager.FeatureFace) == true)
+            {
+                sensors.Add(BiometricSensor.Face);
+            }
+            if (packageManager?.HasSystemFeature(PackageManager.FeatureIris) == true)
+            {
+                sensors.Add(BiometricSensor.Iris);
+            }
+        }
+        
+        return Task.FromResult(new AvailabilityResult
+        {
+            Availability = canAuthenticate switch
+            {
+                BiometricManager.BiometricErrorNoHardware => AuthenticationAvailability.NoSensor,
+                BiometricManager.BiometricErrorHwUnavailable => AuthenticationAvailability.Unknown,
+                BiometricManager.BiometricErrorNoneEnrolled => AuthenticationAvailability.NoBiometric,
+                BiometricManager.BiometricSuccess => AuthenticationAvailability.Available,
+                _ => AuthenticationAvailability.Unknown,
+            },
+            Sensors = sensors,
+        });
     }
 
     public async Task<AuthenticationResult> AuthenticateAsync(
@@ -112,17 +86,17 @@ internal sealed class AndroidBiometricAuthentication : IBiometricAuthentication
         ArgumentNullException.ThrowIfNull(request);
         ArgumentException.ThrowIfNullOrWhiteSpace(request.Title, nameof(request));
 
-        var availability = await GetAvailabilityAsync(request.Authenticators, cancellationToken).ConfigureAwait(true);
-        if (availability != AuthenticationAvailability.Available)
+        var availability = await CheckAvailabilityAsync(request.Authenticators, cancellationToken).ConfigureAwait(true);
+        if (availability.Availability != AuthenticationAvailability.Available)
         {
-            var status = availability == AuthenticationAvailability.Denied ?
+            var status = availability.Availability == AuthenticationAvailability.Denied ?
                 AuthenticationStatus.Denied :
                 AuthenticationStatus.NotAvailable;
 
             return new AuthenticationResult
             {
                 Status = status,
-                ErrorMessage = availability.ToString(),
+                ErrorMessage = availability.Availability.ToString(),
             };
         }
         
@@ -183,5 +157,25 @@ internal sealed class AndroidBiometricAuthentication : IBiometricAuthentication
                 ErrorMessage = e.Message,
             };
         }
+    }
+    
+    private static int GetAllowedAuthenticators(
+        Authenticator authenticators = AuthenticationRequest.DefaultAuthenticators)
+    {
+        var androidAuthenticators = 0;
+        if (authenticators.HasFlag(Authenticator.Biometric))
+        {
+            androidAuthenticators |= BiometricManager.Authenticators.BiometricWeak;
+        }
+        if (authenticators.HasFlag(Authenticator.DeviceCredential))
+        {
+            androidAuthenticators |= BiometricManager.Authenticators.DeviceCredential;
+        }
+        if (authenticators.HasFlag(Authenticator.BiometricStrong))
+        {
+            androidAuthenticators |= BiometricManager.Authenticators.BiometricStrong;
+        }
+        
+        return androidAuthenticators;
     }
 }

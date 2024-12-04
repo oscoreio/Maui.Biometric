@@ -7,7 +7,7 @@ namespace Maui.Biometric;
 public static class BiometricAuthenticationExtensions
 {
     /// <summary>
-    /// Checks if <see cref="IBiometricAuthentication.GetAvailabilityAsync"/> returns <see cref="AuthenticationAvailability.Available"/>.
+    /// Checks if <see cref="IBiometricAuthentication.CheckAvailabilityAsync"/> returns <see cref="AuthenticationAvailability.Available"/>.
     /// </summary>
     /// <param name="biometricAuthentication"></param>
     /// <param name="authenticators"></param>
@@ -20,8 +20,8 @@ public static class BiometricAuthenticationExtensions
     {
         ArgumentNullException.ThrowIfNull(biometricAuthentication);
         
-        var availability = await biometricAuthentication.GetAvailabilityAsync(authenticators, cancellationToken).ConfigureAwait(false);
+        var availability = await biometricAuthentication.CheckAvailabilityAsync(authenticators, cancellationToken).ConfigureAwait(false);
         
-        return availability == AuthenticationAvailability.Available;
+        return availability.IsAvailable;
     }
 }

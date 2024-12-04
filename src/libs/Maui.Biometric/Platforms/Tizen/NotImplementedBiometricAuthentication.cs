@@ -1,31 +1,19 @@
 ﻿// ReSharper disable once CheckNamespace
 namespace Maui.Biometric;
 
-/// <inheritdoc />
-public class NotImplementedBiometricAuthentication : IBiometricAuthentication
+internal class NotImplementedBiometricAuthentication : IBiometricAuthentication
 {
-    /// <inheritdoc />
-    public Task<AuthenticationAvailability> GetAvailabilityAsync(
+    public Task<AvailabilityResult> CheckAvailabilityAsync(
         Authenticator authenticators = AuthenticationRequest.DefaultAuthenticators,
         CancellationToken cancellationToken = default)
     {
-        return Task.FromResult(AuthenticationAvailability.NoImplementation);
-    }
-
-    /// <inheritdoc />
-    public Task<AuthenticationType> GetAuthenticationTypeAsync(
-        Authenticator authenticators = AuthenticationRequest.DefaultAuthenticators,
-        CancellationToken cancellationToken = default)
-    {
-        return Task.FromResult(AuthenticationType.None);
+        return Task.FromResult(new AvailabilityResult
+        {
+            Availability = AuthenticationAvailability.NoImplementation,
+            Sensors = [],
+        });
     }
     
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="request"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
     public virtual Task<AuthenticationResult> AuthenticateAsync(
         AuthenticationRequest request,
         CancellationToken cancellationToken = default)

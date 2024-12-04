@@ -2,31 +2,31 @@
 namespace Maui.Biometric;
 
 /// <summary>
-/// The result of the authentication.
+/// The result of the check for biometric authentication availability.
 /// </summary>
-public class AuthenticationResult
+public class AvailabilityResult
 {
     /// <summary>
     /// Indicates if the authentication was successful.
     /// </summary>
-    public bool IsSuccessful => Status == AuthenticationStatus.Success;
+    public bool IsAvailable => Availability == AuthenticationAvailability.Available;
 
     /// <summary>
     /// Detailed information of the authentication.
     /// </summary>
-    public required AuthenticationStatus Status { get; init; }
-
+    public required AuthenticationAvailability Availability { get; init; }
+    
     /// <summary>
-    /// Reason for the unsuccessful authentication.
+    /// The biometric sensors available on the device.
     /// </summary>
-    public string ErrorMessage { get; init; } = string.Empty;
+    public required HashSet<BiometricSensor> Sensors { get; init; }
     
     /// <summary>
     /// 
     /// </summary>
     /// <param name="result"></param>
     /// <returns></returns>
-    public static implicit operator bool(AuthenticationResult result)
+    public static implicit operator bool(AvailabilityResult result)
     {
         return result?.ToBoolean() ?? false;
     }
@@ -37,6 +37,6 @@ public class AuthenticationResult
     /// <returns></returns>
     public bool ToBoolean()
     {
-        return IsSuccessful;
+        return IsAvailable;
     }
 }
