@@ -50,16 +50,14 @@ builder
 
 - Use through `BiometricAuthentication.Current` or using `IBiometricAuthentication` from DI:
 ```csharp
-if (await BiometricAuthentication.Current.IsAvailableAsync())
+// You don't need to check if the device supports biometric authentication, the plugin does it for you
+var result = await BiometricAuthentication.Current.TryAuthenticateAsync(
+    new AuthenticationRequest(
+        title: "Authenticate",
+        reason: "Please authenticate to proceed"));
+if (result.IsSuccessful)
 {
-    var result = await BiometricAuthentication.Current.AuthenticateAsync(
-        new AuthenticationRequest(
-            title: "Authenticate",
-            reason: "Please authenticate to proceed"));
-    if (result.IsSuccessful)
-    {
-        // User authenticated
-    }
+    // User authenticated
 }
 ```
 

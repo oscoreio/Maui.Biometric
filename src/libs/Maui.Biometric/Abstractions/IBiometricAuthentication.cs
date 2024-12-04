@@ -17,23 +17,21 @@ public interface IBiometricAuthentication
     /// with some other platform specific reason.
     /// </summary>
     /// <param name="authenticators"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>Authentication availability</returns>
     Task<AuthenticationAvailability> GetAvailabilityAsync(
-        Authenticator authenticators = AuthenticationRequest.DefaultAuthenticators);
-
-    /// <summary>
-    /// Checks if <see cref="GetAvailabilityAsync"/> returns <see cref="AuthenticationAvailability.Available"/>.
-    /// </summary>
-    /// <param name="authenticators"></param>
-    /// <returns><c>true</c> if Available, else <c>false</c></returns>
-    Task<bool> IsAvailableAsync(
-        Authenticator authenticators = AuthenticationRequest.DefaultAuthenticators);
+        Authenticator authenticators = AuthenticationRequest.DefaultAuthenticators,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets the available authentication type.
     /// </summary>
+    /// <param name="authenticators"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns>Authentication type</returns>
     Task<AuthenticationType> GetAuthenticationTypeAsync(
-        Authenticator authenticators = AuthenticationRequest.DefaultAuthenticators);
+        Authenticator authenticators = AuthenticationRequest.DefaultAuthenticators,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Requests the authentication.

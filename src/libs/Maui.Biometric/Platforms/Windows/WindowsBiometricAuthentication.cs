@@ -3,16 +3,18 @@ using Windows.Security.Credentials.UI;
 // ReSharper disable once CheckNamespace
 namespace Maui.Biometric;
 
-internal sealed class WindowsBiometricAuthentication : NotImplementedBiometricAuthentication
+internal sealed class WindowsBiometricAuthentication : IBiometricAuthentication
 {
-    protected override async Task<AuthenticationResult> NativeAuthenticateAsync(
+    public async Task<AuthenticationResult> AuthenticateAsync(
         AuthenticationRequest configuration,
         CancellationToken cancellationToken = default)
     {
         try
         {
-            var verificationResult = await UserConsentVerifier.RequestVerificationAsync(
-                message: configuration.Reason);
+            var operation = UserConsentVerifier.RequestVerificationAsync(message: configuration.Reason);
+            await using var registration = cancellationToken.Register(() => operation.Cancel()).ConfigureAwait(true);
+            
+            var verificationResult = await operation;
 
             return new AuthenticationResult
             {
@@ -48,10 +50,14 @@ internal sealed class WindowsBiometricAuthentication : NotImplementedBiometricAu
         }
     }
 
-    public override async Task<AuthenticationAvailability> GetAvailabilityAsync(
-        Authenticator authenticators = AuthenticationRequest.DefaultAuthenticators)
+    public async Task<AuthenticationAvailability> GetAvailabilityAsync(
+        Authenticator authenticators = AuthenticationRequest.DefaultAuthenticators,
+        CancellationToken cancellationToken = default)
     {
-        var availability = await UserConsentVerifier.CheckAvailabilityAsync();
+        var operation = UserConsentVerifier.CheckAvailabilityAsync();
+        await using var registration = cancellationToken.Register(() => operation.Cancel()).ConfigureAwait(true);
+        
+        var availability = await operation;
         
         return availability switch
         {
@@ -64,10 +70,11 @@ internal sealed class WindowsBiometricAuthentication : NotImplementedBiometricAu
         };
     }
 
-    public override async Task<AuthenticationType> GetAuthenticationTypeAsync(
-        Authenticator authenticators = AuthenticationRequest.DefaultAuthenticators)
+    public async Task<AuthenticationType> GetAuthenticationTypeAsync(
+        Authenticator authenticators = AuthenticationRequest.DefaultAuthenticators,
+        CancellationToken cancellationToken = default)
     {
-        var availability = await GetAvailabilityAsync(authenticators).ConfigureAwait(false);
+        var availability = await GetAvailabilityAsync(authenticators, cancellationToken).ConfigureAwait(true);
         if (availability is AuthenticationAvailability.NoBiometric or
                             AuthenticationAvailability.NoPermission or
                             AuthenticationAvailability.Available)

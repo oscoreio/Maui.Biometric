@@ -9,15 +9,16 @@ using Application = Android.App.Application;
 // ReSharper disable once CheckNamespace
 namespace Maui.Biometric;
 
-internal sealed class AndroidBiometricAuthentication : NotImplementedBiometricAuthentication
+internal sealed class AndroidBiometricAuthentication : IBiometricAuthentication
 {
     private readonly BiometricManager _manager = BiometricManager.From(Application.Context);
 
-    public override async Task<AuthenticationType> GetAuthenticationTypeAsync(
-        Authenticator authenticators = AuthenticationRequest.DefaultAuthenticators)
+    public async Task<AuthenticationType> GetAuthenticationTypeAsync(
+        Authenticator authenticators = AuthenticationRequest.DefaultAuthenticators,
+        CancellationToken cancellationToken = default)
     {
         var availability = await GetAvailabilityAsync(
-            authenticators).ConfigureAwait(false);
+            authenticators, cancellationToken).ConfigureAwait(true);
         if (availability is AuthenticationAvailability.NoBiometric or 
                             AuthenticationAvailability.NoPermission or 
                             AuthenticationAvailability.Available)
@@ -49,8 +50,9 @@ internal sealed class AndroidBiometricAuthentication : NotImplementedBiometricAu
 
     }
     
-    public override Task<AuthenticationAvailability> GetAvailabilityAsync(
-        Authenticator authenticators = AuthenticationRequest.DefaultAuthenticators)
+    public Task<AuthenticationAvailability> GetAvailabilityAsync(
+        Authenticator authenticators = AuthenticationRequest.DefaultAuthenticators,
+        CancellationToken cancellationToken = default)
     {
         if (!OperatingSystem.IsAndroidVersionAtLeast(23))
         {
@@ -103,7 +105,7 @@ internal sealed class AndroidBiometricAuthentication : NotImplementedBiometricAu
         }
     }
 
-    protected override async Task<AuthenticationResult> NativeAuthenticateAsync(
+    public async Task<AuthenticationResult> AuthenticateAsync(
         AuthenticationRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -128,6 +130,7 @@ internal sealed class AndroidBiometricAuthentication : NotImplementedBiometricAu
                 : builder.SetNegativeButtonText(cancel);
             
             var info = builder.Build();
+            //var executor = ContextCompat.GetMainExecutor(Platform.CurrentActivity);
             var executor = Executors.NewSingleThreadExecutor();
             if (executor is null)
             {
@@ -150,7 +153,7 @@ internal sealed class AndroidBiometricAuthentication : NotImplementedBiometricAu
             using var dialog = new BiometricPrompt(fragmentActivity, executor, handler);
             await using var registration = cancellationToken.Register(
                 // ReSharper disable once AccessToDisposedClosure
-                () => dialog.CancelAuthentication()).ConfigureAwait(false);
+                () => dialog.CancelAuthentication()).ConfigureAwait(true);
             
             dialog.Authenticate(info);
             

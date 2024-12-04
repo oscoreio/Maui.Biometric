@@ -7,9 +7,9 @@ namespace Maui.Biometric;
 /// According to the Apple documentation:
 /// https://developer.apple.com/documentation/LocalAuthentication/logging-a-user-into-your-app-with-face-id-or-touch-id
 /// </summary>
-internal sealed class IosBiometricAuthentication : NotImplementedBiometricAuthentication
+internal sealed class IosBiometricAuthentication : IBiometricAuthentication
 {
-    protected override async Task<AuthenticationResult> NativeAuthenticateAsync(
+    public async Task<AuthenticationResult> AuthenticateAsync(
         AuthenticationRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -23,10 +23,7 @@ internal sealed class IosBiometricAuthentication : NotImplementedBiometricAuthen
             context.LocalizedCancelTitle = request.CancelTitle;
         }
 
-        await using var registration = cancellationToken.Register(() =>
-        {
-            context.Invalidate();
-        }).ConfigureAwait(true);
+        await using var registration = cancellationToken.Register(() => context.Invalidate()).ConfigureAwait(true);
         
         // DeviceOwnerAuthentication(Strength: Any)
         // https://developer.apple.com/documentation/localauthentication/lapolicy/deviceownerauthentication
@@ -49,8 +46,9 @@ internal sealed class IosBiometricAuthentication : NotImplementedBiometricAuthen
         return result;
     }
 
-    public override Task<AuthenticationAvailability> GetAvailabilityAsync(
-        Authenticator authenticators = AuthenticationRequest.DefaultAuthenticators)
+    public Task<AuthenticationAvailability> GetAvailabilityAsync(
+        Authenticator authenticators = AuthenticationRequest.DefaultAuthenticators,
+        CancellationToken cancellationToken = default)
     {
         using var context = new LAContext();
         
@@ -60,8 +58,9 @@ internal sealed class IosBiometricAuthentication : NotImplementedBiometricAuthen
                 : error.ToAvailability());
     }
 
-    public override Task<AuthenticationType> GetAuthenticationTypeAsync(
-        Authenticator authenticators = AuthenticationRequest.DefaultAuthenticators)
+    public Task<AuthenticationType> GetAuthenticationTypeAsync(
+        Authenticator authenticators = AuthenticationRequest.DefaultAuthenticators,
+        CancellationToken cancellationToken = default)
     {
         using var context = new LAContext();
         

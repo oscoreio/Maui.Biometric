@@ -133,7 +133,7 @@ public partial class MainViewModel : ObservableObject
 
         Status = string.Empty;
 
-        var result = await BiometricAuthentication.Current.AuthenticateAsync(
+        var result = await BiometricAuthentication.Current.TryAuthenticateAsync(
             request: new AuthenticationRequest(
                 title: "My App",
                 reason: reason)
@@ -143,11 +143,6 @@ public partial class MainViewModel : ObservableObject
                 FallbackTitle = fallback ?? string.Empty,
                 Authenticators = Authenticators,
                 ConfirmationRequired = ConfirmationRequired,
-                // HelpTexts =
-                // {
-                //     // optional
-                //     MovedTooFast = tooFast ?? string.Empty,
-                // }
             },
             cancellationToken: cancellationTokenSource.Token);
         if (!result.IsSuccessful)
