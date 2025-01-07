@@ -1,7 +1,7 @@
 ﻿// ReSharper disable once CheckNamespace
 namespace Maui.Biometric;
 
-internal class NotImplementedBiometricAuthentication : IBiometricAuthentication
+internal sealed class NotImplementedBiometricAuthentication : IBiometricAuthentication
 {
     public Task<AvailabilityResult> CheckAvailabilityAsync(
         Authenticator authenticators = AuthenticationRequest.DefaultAuthenticators,
@@ -14,7 +14,7 @@ internal class NotImplementedBiometricAuthentication : IBiometricAuthentication
         });
     }
     
-    public virtual Task<AuthenticationResult> AuthenticateAsync(
+    public Task<AuthenticationResult> AuthenticateAsync(
         AuthenticationRequest request,
         CancellationToken cancellationToken = default)
     {
