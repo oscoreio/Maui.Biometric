@@ -1,0 +1,13 @@
+name: Issue to PR using Aider
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  generate:
+    uses: oscoreio/ai-workflows/.github/workflows/issue-to-pr-using-aider.yml@main
+    if: github.event.label.name == 'aider'
+    with:
+      issue-number: ${{ github.event.issue.number }}
+    secrets:
+      openai-api-key: ${{ secrets.OPENAI_API_KEY }}
