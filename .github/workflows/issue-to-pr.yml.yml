@@ -11,3 +11,4 @@ jobs:
       issue-number: ${{ github.event.issue.number }}
     secrets:
       openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+      openrouter-api-key: ${{ secrets.OPENROUTER_API_KEY }}
