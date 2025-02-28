@@ -1,14 +1,27 @@
 name: Issue to PR using Aider
+
 on:
   issues:
-    types: [labeled]
+    types: [opened, labeled]
 
 jobs:
   generate:
+    # Run the job if:
+    # - The event is "labeled" and the label name starts with "aider", OR
+    # - The event is "opened" and one of the issue's labels contains "aider"
+    if: >
+      (github.event.action == 'labeled' && startsWith(github.event.label.name, 'aider'))
+      ||
+      (github.event.action == 'opened' && contains(join(github.event.issue.labels.*.name, ' '), 'aider'))
     uses: oscoreio/ai-workflows/.github/workflows/issue-to-pr-using-aider.yml@main
-    if: startsWith(github.event.label.name, 'aider')
     with:
       issue-number: ${{ github.event.issue.number }}
     secrets:
+      # You need set one of these keys
+      openrouter-api-key: ${{ secrets.OPENROUTER_API_KEY }} # while it allows to use DeepSeek R1 for free, it still required to rate-limiting you
       openai-api-key: ${{ secrets.OPENAI_API_KEY }}
-      openrouter-api-key: ${{ secrets.OPENROUTER_API_KEY }}
+      anthropic-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
+      groq-api-key: ${{ secrets.GROQ_API_KEY }}
+      gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
+      cohere-api-key: ${{ secrets.COHERE_API_KEY }}
+      deepseek-api-key: ${{ secrets.DEEPSEEK_API_KEY }}
