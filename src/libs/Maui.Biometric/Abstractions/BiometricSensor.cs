@@ -16,9 +16,5 @@ public enum BiometricSensor
     /// </summary>
     Fingerprint,
 
-    /// <summary>
-    /// Device supports face detection.
-    /// </summary>
-    Face,
 
 }

@@ -38,7 +38,7 @@ public enum Authenticator
     DeviceCredential = 1,
     
     /// <summary>
-    /// Any biometric (e.g. fingerprint, iris, or face) on the device. <br/>
+    /// Fingerprint-based authentication. <br/>
     /// <list type="table">
     /// <item>
     ///     <term>MacCatalyst</term>

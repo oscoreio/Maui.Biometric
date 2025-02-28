@@ -53,14 +53,6 @@ internal sealed class AndroidBiometricAuthentication : IBiometricAuthentication
         {
             sensors.Add(BiometricSensor.Fingerprint);
         }
-        if (OperatingSystem.IsAndroidVersionAtLeast(29))
-        {
-            if (packageManager?.HasSystemFeature(PackageManager.FeatureFace) == true)
-            {
-                sensors.Add(BiometricSensor.Face);
-            }
-        }
-        
         return Task.FromResult(new AvailabilityResult
         {
             Availability = canAuthenticate switch
