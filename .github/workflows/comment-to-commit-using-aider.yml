@@ -1,0 +1,16 @@
+name: Comment to Commit using Aider
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  generate:
+    # Only run if the comment is on a PR and contains "@aider"
+    if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, '@aider') }}
+    uses: oscoreio/ai-workflows/.github/workflows/comment-to-commit-using-aider.yml@main
+    with:
+      comment-id: ${{ github.event.comment.id }}
+      pr-url: ${{ github.event.issue.pull_request.url }}
+    secrets:
+      openai-api-key: ${{ secrets.OPENAI_API_KEY }}
