@@ -78,8 +78,6 @@ internal sealed class IosBiometricAuthentication : IBiometricAuthentication
             Availability = availability,
             Sensors = [context.BiometryType switch
             {
-                LABiometryType.None => BiometricSensor.None,
-                LABiometryType.TouchId => BiometricSensor.Fingerprint,
                 LABiometryType.FaceId => BiometricSensor.Face,
                 LABiometryType.OpticId => BiometricSensor.None,
                 _ => BiometricSensor.None,

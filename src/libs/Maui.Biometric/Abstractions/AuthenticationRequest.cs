@@ -6,7 +6,7 @@ namespace Maui.Biometric;
 /// </summary>
 /// <param name="title"></param>
 /// <param name="reason"></param>
-public class AuthenticationRequest(
+public record AuthenticationRequest(
     string title,
     string reason)
 {
@@ -37,8 +37,8 @@ public class AuthenticationRequest(
 
     /// <summary>
     /// If set only allows certain authenticators to be used during authentication. <br/>
-    /// Can be set to <see cref="Authenticator.BiometricStrong"/>  to use only fingerprint,
-    /// if the face unlocking is configured to be <see cref="Authenticator.Biometric"/>,
+    /// Can be set to <see cref="Authenticator.BiometricStrong"/> to use strong biometric authentication,
+    /// depending on platform capabilities and configuration,
     /// but this really depends on the phone manufacturers.
     /// </summary>
     public Authenticator Authenticators { get; set; } = DefaultAuthenticators;

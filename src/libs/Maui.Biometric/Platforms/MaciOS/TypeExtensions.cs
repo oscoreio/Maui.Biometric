@@ -45,6 +45,7 @@ internal static class TypeExtensions
             LAStatus.BiometryLockout => AuthenticationStatus.TooManyAttempts,
             // this can happen if it was available, but the user didn't allow face ID
             LAStatus.BiometryNotAvailable when error.IsDeniedError() => AuthenticationStatus.Denied,
+            LABiometryType.TouchId => BiometricSensor.None,
             LAStatus.BiometryNotAvailable => AuthenticationStatus.NotAvailable,
             LAStatus.CompanionNotAvailable => AuthenticationStatus.NotAvailable,
             _ => AuthenticationStatus.UnknownError

@@ -9,10 +9,10 @@ public interface IBiometricAuthentication
     /// <summary>
     /// Checks the availability of biometric authentication. <br/>
     /// Checks are performed in this order: <br/>
-    /// 1. Operating System API supports accessing the fingerprint sensor <br/>
-    /// 2. Permission for accessing the fingerprint sensor granted <br/>
-    /// 3. Device has sensor <br/>
-    /// 4. Fingerprint has been enrolled <br/>
+    /// 1. Operating System API supports biometric authentication <br/>
+    /// 2. Required permissions granted <br/>
+    /// 3. Device has biometric sensor <br/>
+    /// 4. Biometric enrollment exists <br/>
     /// <see cref="AuthenticationAvailability.Unknown"/> will be returned if the check failed 
     /// with some other platform specific reason.
     /// </summary>

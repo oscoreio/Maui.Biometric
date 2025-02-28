@@ -23,16 +23,6 @@ internal sealed class AndroidBiometricAuthentication : IBiometricAuthentication
             });
         }
         
-        if (OperatingSystem.IsAndroidVersionAtLeast(23) &&
-            !OperatingSystem.IsAndroidVersionAtLeast(28) &&
-            Platform.AppContext.CheckCallingOrSelfPermission(Manifest.Permission.UseFingerprint) != Permission.Granted)
-        {
-            return Task.FromResult(new AvailabilityResult
-            {
-                Availability = AuthenticationAvailability.NoPermission,
-                Sensors = [],
-            });
-        }
 
         if (OperatingSystem.IsAndroidVersionAtLeast(28) &&
             Platform.AppContext.CheckCallingOrSelfPermission(Manifest.Permission.UseBiometric) != Permission.Granted)
@@ -47,12 +37,6 @@ internal sealed class AndroidBiometricAuthentication : IBiometricAuthentication
         var biometricManager = BiometricManager.From(Platform.AppContext);
         var canAuthenticate = biometricManager.CanAuthenticate(GetAllowedAuthenticators(authenticators));
 
-        var sensors = new HashSet<BiometricSensor>();
-        var packageManager = Platform.AppContext.PackageManager;
-        if (packageManager?.HasSystemFeature(PackageManager.FeatureFingerprint) == true)
-        {
-            sensors.Add(BiometricSensor.Fingerprint);
-        }
         return Task.FromResult(new AvailabilityResult
         {
             Availability = canAuthenticate switch
