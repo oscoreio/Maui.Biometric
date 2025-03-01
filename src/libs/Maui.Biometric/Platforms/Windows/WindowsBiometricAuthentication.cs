@@ -30,7 +30,7 @@ internal sealed class WindowsBiometricAuthentication : IBiometricAuthentication
 
         try
         {
-            var operation = UserConsentVerifier.RequestVerificationAsync(message: request.Reason);
+            var operation = UserConsentVerifier.RequestVerificationAsync(message: reason);
             await using var registration = cancellationToken.Register(() => operation.Cancel()).ConfigureAwait(true);
             
             var verificationResult = await operation;
@@ -71,7 +71,7 @@ internal sealed class WindowsBiometricAuthentication : IBiometricAuthentication
     }
 
     public async Task<AvailabilityResult> CheckAvailabilityAsync(
-        Authenticator authenticators = AuthenticationRequest.DefaultAuthenticators,
+        Authenticator authenticators = Authenticator.Biometric | Authenticator.DeviceCredential,
         CancellationToken cancellationToken = default)
     {
         var operation = UserConsentVerifier.CheckAvailabilityAsync();
