@@ -3,17 +3,15 @@ name: Comment to Commit using Aider
 on:
   issue_comment:
     types: [created]
-  pull_request_review_comment:
-    types: [created]
 
 jobs:
   generate:
     # Only run if the comment is on a PR and contains "@aider"
-    if: ${{ contains(github.event.comment.body, '@aider') }}
+    if: ${{ github.event.issue.pull_request && contains(github.event.comment.body, '@aider') }}
     uses: oscoreio/ai-workflows/.github/workflows/comment-to-commit-using-aider.yml@main
     with:
       comment-id: ${{ github.event.comment.id }}
-      pr-url: ${{ github.event.issue.pull_request.url || github.event.pull_request.url }}
+      pr-url: ${{ github.event.issue.pull_request.url }}
     secrets:
       # You need set one of these keys
       openrouter-api-key: ${{ secrets.OPENROUTER_API_KEY }} # while it allows to use DeepSeek R1 for free, it still required to rate-limiting you
