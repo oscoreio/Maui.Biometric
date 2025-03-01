@@ -31,6 +31,8 @@ jobs:
       - name: Checkout branch
         uses: actions/checkout@v3
         with:
+          # Check out the branch: use GITHUB_HEAD_REF if available (PR context),
+          # otherwise fall back to GITHUB_REF.
           ref: ${{ github.head_ref || github.ref }}
       
       - name: Set up Git user configuration
@@ -44,15 +46,29 @@ jobs:
           echo "Reverting commit: $LAST_COMMIT"
           git revert --no-edit $LAST_COMMIT
       
+      - name: Determine branch name
+        id: branch
+        run: |
+          # If running in a PR, GITHUB_HEAD_REF should be set.
+          if [ -n "$GITHUB_HEAD_REF" ]; then
+            echo "Using GITHUB_HEAD_REF: $GITHUB_HEAD_REF"
+            echo "::set-output name=branch::$GITHUB_HEAD_REF"
+          else
+            # Try to extract the branch from the event payload (for issue_comment events on PRs)
+            BRANCH=$(jq -r '.pull_request.head.ref // .issue.pull_request.head.ref' "$GITHUB_EVENT_PATH")
+            if [ "$BRANCH" = "null" ] || [ -z "$BRANCH" ]; then
+              # Fallback: remove 'refs/heads/' from GITHUB_REF
+              BRANCH="${GITHUB_REF#refs/heads/}"
+            fi
+            echo "Determined branch: $BRANCH"
+            echo "::set-output name=branch::$BRANCH"
+          fi
+        shell: bash
+      
       - name: Push changes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Determine branch using GITHUB_HEAD_REF if set (for PRs), else derive from GITHUB_REF
-          if [ -n "$GITHUB_HEAD_REF" ]; then
-            BRANCH="$GITHUB_HEAD_REF"
-          else
-            BRANCH="${GITHUB_REF#refs/heads/}"
-          fi
-          echo "Pushing changes to branch: $BRANCH"
-          git push origin HEAD:"$BRANCH"
+          TARGET_BRANCH="${{ steps.branch.outputs.branch }}"
+          echo "Pushing changes to branch: $TARGET_BRANCH"
+          git push origin HEAD:"$TARGET_BRANCH"
