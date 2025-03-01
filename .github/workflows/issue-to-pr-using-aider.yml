@@ -16,7 +16,7 @@ jobs:
     uses: oscoreio/ai-workflows/.github/workflows/issue-to-pr-using-aider.yml@main
     with:
       issue-number: ${{ github.event.issue.number }}
-      install-command: 'dotnet workflow install maui'
+      install-command: 'dotnet workload install maui'
       test-command: 'dotnet build'
     secrets:
       # You need set one of these keys
