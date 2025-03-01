@@ -31,15 +31,11 @@ public partial class MainViewModel : ObservableObject
     private bool _biometricAuthenticator = AuthenticationRequest.DefaultAuthenticators.HasFlag(Authenticator.Biometric);
 
     [ObservableProperty]
-    private bool _biometricStrongAuthenticator = AuthenticationRequest.DefaultAuthenticators.HasFlag(Authenticator.BiometricStrong);
-
-    [ObservableProperty]
     private bool _companionDeviceAuthenticator = AuthenticationRequest.DefaultAuthenticators.HasFlag(Authenticator.CompanionDevice);
     
     private Authenticator Authenticators => 
         (DeviceCredentialAuthenticator ? Authenticator.DeviceCredential : 0) |
         (BiometricAuthenticator ? Authenticator.Biometric : 0) |
-        (BiometricStrongAuthenticator ? Authenticator.BiometricStrong : 0) |
         (CompanionDeviceAuthenticator ? Authenticator.CompanionDevice : 0);
 
     async partial void OnDeviceCredentialAuthenticatorChanged(bool value)
@@ -48,11 +44,6 @@ public partial class MainViewModel : ObservableObject
     }
     
     async partial void OnBiometricAuthenticatorChanged(bool value)
-    {
-        await Appearing();
-    }
-    
-    async partial void OnBiometricStrongAuthenticatorChanged(bool value)
     {
         await Appearing();
     }

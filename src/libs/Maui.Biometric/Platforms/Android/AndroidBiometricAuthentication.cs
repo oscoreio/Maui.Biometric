@@ -53,6 +53,8 @@ internal sealed class AndroidBiometricAuthentication : IBiometricAuthentication
         {
             sensors.Add(BiometricSensor.Fingerprint);
         }
+        // Removed Face sensor detection
+        /*
         if (OperatingSystem.IsAndroidVersionAtLeast(29))
         {
             if (packageManager?.HasSystemFeature(PackageManager.FeatureFace) == true)
@@ -60,6 +62,7 @@ internal sealed class AndroidBiometricAuthentication : IBiometricAuthentication
                 sensors.Add(BiometricSensor.Face);
             }
         }
+        */
         
         return Task.FromResult(new AvailabilityResult
         {

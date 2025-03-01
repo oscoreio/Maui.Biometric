@@ -4,11 +4,7 @@ namespace Maui.Biometric;
 /// <summary>
 /// Represents a request for authentication.
 /// </summary>
-/// <param name="title"></param>
-/// <param name="reason"></param>
-public class AuthenticationRequest(
-    string title,
-    string reason)
+public class AuthenticationRequest
 {
     /// <summary>
     /// Default authenticators that are used during authentication.
@@ -18,12 +14,12 @@ public class AuthenticationRequest(
     /// <summary>
     /// Title of the authentication request.
     /// </summary>
-    public string Title { get; } = title;
+    public string Title { get; }
 
     /// <summary>
     /// Reason for the authentication request.
     /// </summary>
-    public string Reason { get; } = reason;
+    public string Reason { get; }
 
     /// <summary>
     /// Title of the cancel button.
@@ -54,4 +50,15 @@ public class AuthenticationRequest(
     /// Default: true <br/>
     /// </summary>
     public bool ConfirmationRequired { get; set; } = true;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AuthenticationRequest"/> class.
+    /// </summary>
+    /// <param name="title">The title of the authentication request.</param>
+    /// <param name="reason">The reason for the authentication request.</param>
+    public AuthenticationRequest(string title, string reason)
+    {
+        Title = title;
+        Reason = reason;
+    }
 }

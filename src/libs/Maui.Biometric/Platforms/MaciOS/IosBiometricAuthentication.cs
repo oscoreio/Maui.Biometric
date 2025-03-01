@@ -80,7 +80,10 @@ internal sealed class IosBiometricAuthentication : IBiometricAuthentication
             {
                 LABiometryType.None => BiometricSensor.None,
                 LABiometryType.TouchId => BiometricSensor.Fingerprint,
+                // Removed FaceId support
+                /*
                 LABiometryType.FaceId => BiometricSensor.Face,
+                */
                 // https://support.apple.com/en-ae/118483
                 _ => BiometricSensor.None,
             }],
