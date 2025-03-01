@@ -14,7 +14,7 @@ jobs:
       comment-id: ${{ github.event.comment.id }}
       pr-url: ${{ github.event.issue.pull_request.url || github.event.pull_request.url }}
       is-review: ${{ github.event_name == 'pull_request_review_comment' }}
-      install-command: 'dotnet workflow install maui'
+      install-command: 'dotnet workload install maui'
       test-command: 'dotnet build'
     secrets:
       # You need set one of these keys
