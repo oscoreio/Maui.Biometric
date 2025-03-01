@@ -59,10 +59,6 @@ internal sealed class AndroidBiometricAuthentication : IBiometricAuthentication
             {
                 sensors.Add(BiometricSensor.Face);
             }
-            if (packageManager?.HasSystemFeature(PackageManager.FeatureIris) == true)
-            {
-                sensors.Add(BiometricSensor.Iris);
-            }
         }
         
         return Task.FromResult(new AvailabilityResult

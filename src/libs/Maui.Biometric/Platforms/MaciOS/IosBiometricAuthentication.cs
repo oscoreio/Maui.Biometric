@@ -82,9 +82,6 @@ internal sealed class IosBiometricAuthentication : IBiometricAuthentication
                 LABiometryType.TouchId => BiometricSensor.Fingerprint,
                 LABiometryType.FaceId => BiometricSensor.Face,
                 // https://support.apple.com/en-ae/118483
-#pragma warning disable CA1416
-                LABiometryType.OpticId => BiometricSensor.Iris,
-#pragma warning restore CA1416
                 _ => BiometricSensor.None,
             }],
         });
