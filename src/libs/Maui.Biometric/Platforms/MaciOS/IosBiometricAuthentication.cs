@@ -66,7 +66,7 @@ internal sealed class IosBiometricAuthentication : IBiometricAuthentication
     }
 
     public Task<AvailabilityResult> CheckAvailabilityAsync(
-        Authenticator authenticators = AuthenticationRequest.DefaultAuthenticators,
+        Authenticator authenticators = Authenticator.Biometric | Authenticator.DeviceCredential,
         CancellationToken cancellationToken = default)
     {
         using var context = new LAContext();

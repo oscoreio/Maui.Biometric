@@ -11,7 +11,7 @@ namespace Maui.Biometric;
 internal sealed class AndroidBiometricAuthentication : IBiometricAuthentication
 {
     public Task<AvailabilityResult> CheckAvailabilityAsync(
-        Authenticator authenticators = AuthenticationRequest.DefaultAuthenticators,
+        Authenticator authenticators = Authenticator.Biometric | Authenticator.DeviceCredential,
         CancellationToken cancellationToken = default)
     {
         if (!OperatingSystem.IsAndroidVersionAtLeast(23))

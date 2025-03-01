@@ -14,8 +14,13 @@ internal sealed class NotImplementedBiometricAuthentication : IBiometricAuthenti
         });
     }
     
-    public Task<AuthenticationResult> AuthenticateAsync(
-        AuthenticationRequest request,
+    public async Task<AuthenticationResult> AuthenticateAsync(
+        string title,
+        string reason,
+        Authenticator authenticators = Authenticator.Biometric | Authenticator.DeviceCredential,
+        string cancelTitle = "",
+        string fallbackTitle = "",
+        bool confirmationRequired = true,
         CancellationToken cancellationToken = default)
     {
         return Task.FromResult(new AuthenticationResult
