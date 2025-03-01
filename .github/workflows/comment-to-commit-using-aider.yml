@@ -23,3 +23,31 @@ jobs:
       gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
       cohere-api-key: ${{ secrets.COHERE_API_KEY }}
       deepseek-api-key: ${{ secrets.DEEPSEEK_API_KEY }}
+
+  revert-last-commit:
+    runs-on: ubuntu-latest
+    if: ${{ contains(github.event.comment.body, 'revert last commit') }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Git user configuration
+        run: |
+          # Configure Git with a default user for automated commit reversion
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+      - name: Revert last commit
+        run: |
+          # Retrieve the hash of the last commit
+          LAST_COMMIT=$(git rev-parse HEAD)
+          echo "Reverting commit: $LAST_COMMIT"
+          # Revert the last commit without prompting for a commit message
+          git revert --no-edit $LAST_COMMIT
+
+      - name: Push changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Push the revert commit to the current branch
+          git push origin HEAD:${{ github.ref }}
