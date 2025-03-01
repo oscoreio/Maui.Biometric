@@ -21,8 +21,4 @@ public enum BiometricSensor
     /// </summary>
     Face,
 
-    /// <summary>
-    /// Device supports iris detection(for example Apple OpticId on visionOS).
-    /// </summary>
-    Iris,
 }
