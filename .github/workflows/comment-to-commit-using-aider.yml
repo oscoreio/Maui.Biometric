@@ -14,6 +14,8 @@ jobs:
       comment-id: ${{ github.event.comment.id }}
       pr-url: ${{ github.event.issue.pull_request.url || github.event.pull_request.url }}
       is-review: ${{ github.event_name == 'pull_request_review_comment' }}
+      install-command: 'dotnet workflow install maui'
+      test-command: 'dotnet build'
     secrets:
       # You need set one of these keys
       openrouter-api-key: ${{ secrets.OPENROUTER_API_KEY }} # while it allows to use DeepSeek R1 for free, it still required to rate-limiting you
