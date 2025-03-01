@@ -79,9 +79,9 @@ internal sealed class AndroidBiometricAuthentication : IBiometricAuthentication
         
         try
         {
-            var cancel = string.IsNullOrWhiteSpace(request.CancelTitle) ?
+            var cancel = string.IsNullOrWhiteSpace(cancelTitle) ?
                 Application.Context.GetString(Android.Resource.String.Cancel) :
-                request.CancelTitle;
+                cancelTitle;
 
             var handler = new AuthenticationHandler();
             var builder = new BiometricPrompt.PromptInfo.Builder()
@@ -90,8 +90,8 @@ internal sealed class AndroidBiometricAuthentication : IBiometricAuthentication
                 .SetDescription(reason);
 
             // It's not allowed to allow alternative auth & set the negative button
-            builder = request.Authenticators.HasFlag(Authenticator.DeviceCredential)
-                ? builder.SetAllowedAuthenticators(GetAllowedAuthenticators(request.Authenticators))
+            builder = authenticators.HasFlag(Authenticator.DeviceCredential)
+                ? builder.SetAllowedAuthenticators(GetAllowedAuthenticators(authenticators))
                 : builder.SetNegativeButtonText(cancel);
             
             var info = builder.Build();
@@ -137,7 +137,7 @@ internal sealed class AndroidBiometricAuthentication : IBiometricAuthentication
     }
     
     private static int GetAllowedAuthenticators(
-        Authenticator authenticators = AuthenticationRequest.DefaultAuthenticators)
+        Authenticator authenticators = Authenticator.Biometric | Authenticator.DeviceCredential)
     {
         var androidAuthenticators = 0;
         if (authenticators.HasFlag(Authenticator.Biometric))

@@ -19,7 +19,7 @@ internal sealed class IosBiometricAuthentication : IBiometricAuthentication
         CancellationToken cancellationToken = default)
     {
         var context = new LAContext();
-        var policy = request.Authenticators.MapToLaPolicy();
+        var policy = authenticators.MapToLaPolicy();
         if (!context.CanEvaluatePolicy(policy, out var canEvaluateError))
         {
             return new AuthenticationResult
@@ -32,10 +32,10 @@ internal sealed class IosBiometricAuthentication : IBiometricAuthentication
         }
         
         // Only set the fallback title if the device credential is enabled.
-        if (request.Authenticators.HasFlag(Authenticator.DeviceCredential) &&
+        if (authenticators.HasFlag(Authenticator.DeviceCredential) &&
             !string.IsNullOrEmpty(fallbackTitle))
         {
-            context.LocalizedFallbackTitle = request.FallbackTitle;
+            context.LocalizedFallbackTitle = fallbackTitle;
         }
         if (!string.IsNullOrEmpty(cancelTitle))
         {

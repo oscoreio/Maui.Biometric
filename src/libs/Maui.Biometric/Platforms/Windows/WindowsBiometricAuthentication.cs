@@ -34,7 +34,6 @@ internal sealed class WindowsBiometricAuthentication : IBiometricAuthentication
             await using var registration = cancellationToken.Register(() => operation.Cancel()).ConfigureAwait(true);
             
             var verificationResult = await operation;
-            // Title parameter is not used in Windows implementation but kept for interface consistency
 
             return new AuthenticationResult
             {
