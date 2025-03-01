@@ -64,11 +64,21 @@ jobs:
             echo "::set-output name=branch::$BRANCH"
           fi
         shell: bash
-      
+
+      - name: Pull remote changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Ensure the local branch is up-to-date with the remote.
+          TARGET_BRANCH="${{ steps.branch.outputs.branch }}"
+          echo "Pulling latest changes from branch: $TARGET_BRANCH"
+          git pull --rebase origin "$TARGET_BRANCH"
+
       - name: Push changes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # Push the updated branch with the revert commit.
           TARGET_BRANCH="${{ steps.branch.outputs.branch }}"
           echo "Pushing changes to branch: $TARGET_BRANCH"
           git push origin HEAD:"$TARGET_BRANCH"
