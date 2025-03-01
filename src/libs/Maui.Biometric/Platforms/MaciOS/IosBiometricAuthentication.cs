@@ -10,7 +10,12 @@ namespace Maui.Biometric;
 internal sealed class IosBiometricAuthentication : IBiometricAuthentication
 {
     public async Task<AuthenticationResult> AuthenticateAsync(
-        AuthenticationRequest request,
+        string title,
+        string reason,
+        Authenticator authenticators = Authenticator.Biometric | Authenticator.DeviceCredential,
+        string cancelTitle = "",
+        string fallbackTitle = "",
+        bool confirmationRequired = true,
         CancellationToken cancellationToken = default)
     {
         var context = new LAContext();
@@ -28,13 +33,13 @@ internal sealed class IosBiometricAuthentication : IBiometricAuthentication
         
         // Only set the fallback title if the device credential is enabled.
         if (request.Authenticators.HasFlag(Authenticator.DeviceCredential) &&
-            !string.IsNullOrEmpty(request.FallbackTitle))
+            !string.IsNullOrEmpty(fallbackTitle))
         {
             context.LocalizedFallbackTitle = request.FallbackTitle;
         }
-        if (!string.IsNullOrEmpty(request.CancelTitle))
+        if (!string.IsNullOrEmpty(cancelTitle))
         {
-            context.LocalizedCancelTitle = request.CancelTitle;
+            context.LocalizedCancelTitle = cancelTitle;
         }
 
         await using var registration = cancellationToken.Register(() => context.Invalidate()).ConfigureAwait(true);

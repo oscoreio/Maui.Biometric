@@ -131,22 +131,14 @@ public partial class MainViewModel : ObservableObject
 
         Status = string.Empty;
 
-        if (await BiometricAuthentication.Current.CheckAvailabilityAsync(cancellationToken: cancellationTokenSource.Token))
-        {
-            
-        }
         var result = await BiometricAuthentication.Current.AuthenticateAsync(
-            request: new AuthenticationRequest(
                 title: "My App",
-                reason: reason)
-            {
-                // all optional
-                CancelTitle = cancel ?? string.Empty,
-                FallbackTitle = fallback ?? string.Empty,
-                Authenticators = Authenticators,
-                ConfirmationRequired = ConfirmationRequired,
-            },
-            cancellationToken: cancellationTokenSource.Token);
+                reason: reason,
+                authenticators: Authenticators,
+                cancelTitle: cancel ?? string.Empty,
+                fallbackTitle: fallback ?? string.Empty,
+                confirmationRequired: ConfirmationRequired,
+                cancellationToken: cancellationTokenSource.Token);
         if (!result.IsSuccessful)
         {
             Status = $"{result.Status}: {result.ErrorMessage}";

@@ -52,13 +52,18 @@ internal sealed class AndroidBiometricAuthentication : IBiometricAuthentication
     }
 
     public async Task<AuthenticationResult> AuthenticateAsync(
-        AuthenticationRequest request,
+        string title,
+        string reason,
+        Authenticator authenticators = Authenticator.Biometric | Authenticator.DeviceCredential,
+        string cancelTitle = "",
+        string fallbackTitle = "",
+        bool confirmationRequired = true,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(request);
         ArgumentException.ThrowIfNullOrWhiteSpace(request.Title, nameof(request));
 
-        var availability = await CheckAvailabilityAsync(request.Authenticators, cancellationToken).ConfigureAwait(true);
+        var availability = await CheckAvailabilityAsync(authenticators, cancellationToken).ConfigureAwait(true);
         if (availability.Availability != AuthenticationAvailability.Available)
         {
             var status = availability.Availability == AuthenticationAvailability.Denied ?
@@ -80,9 +85,9 @@ internal sealed class AndroidBiometricAuthentication : IBiometricAuthentication
 
             var handler = new AuthenticationHandler();
             var builder = new BiometricPrompt.PromptInfo.Builder()
-                .SetTitle(request.Title)
-                .SetConfirmationRequired(request.ConfirmationRequired)
-                .SetDescription(request.Reason);
+                .SetTitle(title)
+                .SetConfirmationRequired(confirmationRequired)
+                .SetDescription(reason);
 
             // It's not allowed to allow alternative auth & set the negative button
             builder = request.Authenticators.HasFlag(Authenticator.DeviceCredential)

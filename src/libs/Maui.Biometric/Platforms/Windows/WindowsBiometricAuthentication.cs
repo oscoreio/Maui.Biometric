@@ -6,10 +6,15 @@ namespace Maui.Biometric;
 internal sealed class WindowsBiometricAuthentication : IBiometricAuthentication
 {
     public async Task<AuthenticationResult> AuthenticateAsync(
-        AuthenticationRequest request,
+        string title,
+        string reason,
+        Authenticator authenticators = Authenticator.Biometric | Authenticator.DeviceCredential,
+        string cancelTitle = "",
+        string fallbackTitle = "",
+        bool confirmationRequired = true,
         CancellationToken cancellationToken = default)
     {
-        var availability = await CheckAvailabilityAsync(request.Authenticators, cancellationToken).ConfigureAwait(true);
+        var availability = await CheckAvailabilityAsync(authenticators, cancellationToken).ConfigureAwait(true);
         if (availability.Availability != AuthenticationAvailability.Available)
         {
             var status = availability.Availability == AuthenticationAvailability.Denied ?
@@ -29,6 +34,7 @@ internal sealed class WindowsBiometricAuthentication : IBiometricAuthentication
             await using var registration = cancellationToken.Register(() => operation.Cancel()).ConfigureAwait(true);
             
             var verificationResult = await operation;
+            // Title parameter is not used in Windows implementation but kept for interface consistency
 
             return new AuthenticationResult
             {

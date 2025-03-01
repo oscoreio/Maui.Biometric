@@ -20,7 +20,7 @@ public interface IBiometricAuthentication
     /// <param name="cancellationToken"></param>
     /// <returns>Authentication availability</returns>
     Task<AvailabilityResult> CheckAvailabilityAsync(
-        Authenticator authenticators = AuthenticationRequest.DefaultAuthenticators,
+        Authenticator authenticators = Authenticator.Biometric | Authenticator.DeviceCredential,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -30,6 +30,11 @@ public interface IBiometricAuthentication
     /// <param name="cancellationToken">Token used to cancel the operation.</param>
     /// <returns>Authentication result</returns>
     Task<AuthenticationResult> AuthenticateAsync(
-        AuthenticationRequest request,
+        string title,
+        string reason,
+        Authenticator authenticators = Authenticator.Biometric | Authenticator.DeviceCredential,
+        string cancelTitle = "",
+        string fallbackTitle = "",
+        bool confirmationRequired = true,
         CancellationToken cancellationToken = default);
 }

@@ -15,7 +15,7 @@ public static class BiometricAuthenticationExtensions
     /// <returns><c>true</c> if Available, else <c>false</c></returns>
     public static async Task<bool> IsAvailableAsync(
         this IBiometricAuthentication biometricAuthentication,
-        Authenticator authenticators = AuthenticationRequest.DefaultAuthenticators,
+        Authenticator authenticators = Authenticator.Biometric | Authenticator.DeviceCredential,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(biometricAuthentication);
