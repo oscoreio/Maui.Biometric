@@ -28,24 +28,31 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ contains(github.event.comment.body, 'revert last commit') }}
     steps:
-      - name: Checkout repository
+      - name: Checkout branch
         uses: actions/checkout@v3
         with:
-          ref: ${{ github.head_ref }}
-
+          ref: ${{ github.head_ref || github.ref }}
+      
       - name: Set up Git user configuration
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          
+      
       - name: Revert last commit
         run: |
           LAST_COMMIT=$(git rev-parse HEAD)
           echo "Reverting commit: $LAST_COMMIT"
           git revert --no-edit $LAST_COMMIT
-          
+      
       - name: Push changes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git push origin HEAD:${{ github.head_ref }}
+          # Determine branch using GITHUB_HEAD_REF if set (for PRs), else derive from GITHUB_REF
+          if [ -n "$GITHUB_HEAD_REF" ]; then
+            BRANCH="$GITHUB_HEAD_REF"
+          else
+            BRANCH="${GITHUB_REF#refs/heads/}"
+          fi
+          echo "Pushing changes to branch: $BRANCH"
+          git push origin HEAD:"$BRANCH"
