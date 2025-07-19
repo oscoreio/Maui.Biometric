@@ -10,7 +10,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseMaui>true</UseMaui>
     <NoWarn>$(NoWarn);CA1031;CA2000</NoWarn>
-    <MauiVersion>9.0.70</MauiVersion>
+    <MauiVersion>9.0.90</MauiVersion>
 
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">12.2</SupportedOSPlatformVersion>
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">15.0</SupportedOSPlatformVersion>
@@ -32,12 +32,12 @@
 
   <ItemGroup Condition="$(TargetFramework.Contains('-android')) == true">
     <!-- To fix dependency constraint issues with Xamarin.AndroidX.Biometric -->
-    <PackageReference Include="Xamarin.AndroidX.Collection.Ktx" Version="1.5.0.1" />
-    <PackageReference Include="Xamarin.AndroidX.Fragment.Ktx" Version="1.8.6.1" />
-    <PackageReference Include="Xamarin.AndroidX.Activity.Ktx" Version="1.10.1.1" />
+<!--    <PackageReference Include="Xamarin.AndroidX.Collection.Ktx" Version="1.5.0.1" />-->
+<!--    <PackageReference Include="Xamarin.AndroidX.Fragment.Ktx" Version="1.8.6.1" />-->
+<!--    <PackageReference Include="Xamarin.AndroidX.Activity.Ktx" Version="1.10.1.1" />-->
     
     <!-- AndroidX Biometric -->
-    <PackageReference Include="Xamarin.AndroidX.Biometric" Version="1.1.0.28" />
+    <PackageReference Include="Xamarin.AndroidX.Biometric" Version="1.1.0.29" />
   </ItemGroup>
 
   <!-- iOS & MacCatalyst -->
