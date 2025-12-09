@@ -1,16 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>$(TargetFrameworks);net9.0;net9.0-android;net9.0-ios;net9.0-maccatalyst;net9.0-windows10.0.19041.0</TargetFrameworks>
+    <TargetFrameworks>$(TargetFrameworks);net10.0;net10.0-android;net10.0-ios;net10.0-maccatalyst;net10.0-windows10.0.19041.0</TargetFrameworks>
     <!-- Uncomment to also build the tizen app. You will need to install tizen by following this: https://github.com/Samsung/Tizen.NET -->
-    <TargetFrameworks>$(TargetFrameworks);net9.0-tizen</TargetFrameworks>
+<!--    <TargetFrameworks>$(TargetFrameworks);net10.0-tizen</TargetFrameworks>-->
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <Nullable>enable</Nullable>
     <LangVersion>preview</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseMaui>true</UseMaui>
     <NoWarn>$(NoWarn);CA1031;CA2000</NoWarn>
-    <MauiVersion>9.0.90</MauiVersion>
+    <MauiVersion>10.0.11</MauiVersion>
 
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">12.2</SupportedOSPlatformVersion>
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">15.0</SupportedOSPlatformVersion>
@@ -37,7 +37,7 @@
 <!--    <PackageReference Include="Xamarin.AndroidX.Activity.Ktx" Version="1.10.1.1" />-->
     
     <!-- AndroidX Biometric -->
-    <PackageReference Include="Xamarin.AndroidX.Biometric" Version="1.1.0.29" />
+    <PackageReference Include="Xamarin.AndroidX.Biometric" Version="1.1.0.30" />
   </ItemGroup>
 
   <!-- iOS & MacCatalyst -->
@@ -74,7 +74,7 @@
   </ItemGroup>
   <!-- .NET (generic) -->
   <ItemGroup Condition="!($(TargetFramework.StartsWith('net')) == true AND $(TargetFramework.EndsWith('.0')) == true AND $(TargetFramework.Contains('-')) != true)">
-    <!-- e.g net6.0 or net9.0 (and higher) -->
+    <!-- e.g net6.0 or net10.0 (and higher) -->
     <Compile Remove="**\*.net.cs" />
     <None Include="**\*.net.cs" Exclude="$(DefaultItemExcludes);$(DefaultExcludesInProjectFolder)" />
     <Compile Remove="**\net\**\*.cs" />

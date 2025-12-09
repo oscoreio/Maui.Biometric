@@ -153,6 +153,6 @@ public partial class MainViewModel : ObservableObject
             return;
         }
         
-        await Application.Current!.Windows[0].Page!.DisplayAlert("Success", "You are authenticated!", "OK");
+        await Application.Current!.Windows[0].Page!.DisplayAlertAsync("Success", "You are authenticated!", "OK");
     }
 }

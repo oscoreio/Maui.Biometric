@@ -14,8 +14,10 @@ internal static class TypeExtensions
             OperatingSystem.IsMacOSVersionAtLeast(15)))
         {
             return authenticator.HasFlag(Authenticator.DeviceCredential)
+#pragma warning disable CS0618 // Type or member is obsolete
                 ? LAPolicy.DeviceOwnerAuthenticationWithCompanion
                 : LAPolicy.DeviceOwnerAuthenticationWithBiometricsOrCompanion;
+#pragma warning restore CS0618 // Type or member is obsolete
         }
         
         return authenticator.HasFlag(Authenticator.DeviceCredential)
